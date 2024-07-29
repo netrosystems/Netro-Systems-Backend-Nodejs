@@ -1,7 +1,9 @@
-// models/UserModel.js
+//models/User/UserModel.js
 
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
+const { ENUM_USER_PROVIDER } = require("../../constants/UserConstants");
+const { friendsListSchema, locationSchema } = require("./UserSubschemas");
 const {
   UserLoginDTO,
   UserRegisterDTO,
@@ -9,22 +11,18 @@ const {
   UserFetchDTO,
   UserFriendlistDTO,
   UserFetchWithFriendshipStatusDTO,
-} = require("../../dtos/UserDTO");
-const { generateToken } = require("../../services/tokenHandlers/HandleJwt");
-const { validateOTP } = require("../../services/otpHandlers/HandleOTP");
-const {
-  hashPassword,
-  comparePasswords,
-} = require("../../services/encryptionHandlers/HandleBcrypt");
-const { friendsListSchema, locationSchema } = require("./UserSubschemas");
+} = require("../../dtos");
 const {
   CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
-const { ENUM_USER_PROVIDER } = require("../../constants/UserConstants");
+  hashPassword,
+  comparePasswords,
+  generateToken,
+  validateOTP,
+} = require("../../services");
 const {
   handleFriendRequestNotification,
   handleAcceptedFriendRequestNotification,
-} = require("../../chats/NotificationModule");
+} = require("../../notifications");
 
 const userSchema = new mongoose.Schema({
   username: {

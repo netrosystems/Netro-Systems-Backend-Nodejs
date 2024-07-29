@@ -1,11 +1,9 @@
-// models/GroupChatMessageSchema.js
+//models/Chat/GroupChatModel.js
 
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
-const { GroupChatFetchDTO } = require("../../dtos/ChatDTO");
-const {
-  CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
+const { GroupChatFetchDTO } = require("../../dtos");
+const { CustomError } = require("../../services");
 
 const groupChatMessageSchema = new mongoose.Schema({
   group: {

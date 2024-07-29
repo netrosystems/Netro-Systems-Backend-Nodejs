@@ -1,15 +1,10 @@
-// models/NotificationMessage.js
+//models/Notification/NotificationMessage.js
 
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
-const {
-  CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
-const {
-  ENUM_NOTIFICATION_TYPE,
-  ENUM_ENTITY_TYPE,
-} = require("../../constants/NotificationConstants");
-const { NotificationFetchDTO } = require("../../dtos/NotificationDTO");
+const { CustomError } = require("../../services");
+const { NotificationFetchDTO } = require("../../dtos");
+const { ENUM_NOTIFICATION_TYPE, ENUM_ENTITY_TYPE } = require("../../constants");
 
 const notificationSchema = new mongoose.Schema({
   sender: {

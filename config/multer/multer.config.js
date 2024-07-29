@@ -1,9 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const {
-  sendResponse,
-} = require("../../src/services/responseHandlers/HandleResponse");
+const { sendResponse } = require("../../src/services");
 
 const initializeMulter = (app) => {
   const storage = multer.diskStorage({

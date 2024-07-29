@@ -1,16 +1,16 @@
+//router/Main/DefaultRoutes.js
+
 // Init the default routes for the server
 const express = require("express");
 const path = require("path");
 const DefaultRouter = require("express").Router();
-const { getMetrics } = require("../../../config/monitorings/prometheus.config");
-const { logger } = require("../../services/logHandlers/HandleWinston");
+const { getMetrics } = require("../../../config");
 const {
   sendResponse,
   sendError,
-} = require("../../services/responseHandlers/HandleResponse");
-const {
   handleFileUpload,
-} = require("../../services/fileHandlers/HandleFileUpload");
+  logger,
+} = require("../../services");
 
 // Default route
 DefaultRouter.get("/", (req, res) => {
@@ -59,4 +59,5 @@ DefaultRouter.use((req, res) => {
   sendError(res, 404, "Route not found");
 });
 
+//export the router
 module.exports = DefaultRouter;

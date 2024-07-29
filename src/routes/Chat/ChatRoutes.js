@@ -1,5 +1,7 @@
+//router/Chat/ChatRoutes.js
+
 const ChatRouter = require("express").Router();
-const { authorizeRequest } = require("../../middlewares/AuthorizeRequest");
+const { authorizeRequest } = require("../../middlewares");
 //group chat controller imports
 const {
   getAllChatsByGroupId,
@@ -27,5 +29,5 @@ ChatRouter.get(
 );
 ChatRouter.get("/groups/:groupId", authorizeRequest, getAllChatsByGroupId);
 
-
+//export router
 module.exports = ChatRouter;

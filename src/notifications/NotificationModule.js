@@ -1,8 +1,8 @@
-const { logger } = require("../services/logHandlers/HandleWinston");
-const { CustomError } = require("../services/responseHandlers/HandleResponse");
-const { getIoInstance } = require("../../config/server/socket/socket");
-const Notification = require("../models/Notification/NotificationModel");
+//chat/NotificationModule.js
 const { Timekoto } = require("timekoto");
+const Notification = require("../models");
+const { logger, CustomError } = require("../services");
+const { getIoInstance } = require("../../config/server/socket/socket");
 
 const sendNotification = async (data, message, type, logMessage) => {
   try {

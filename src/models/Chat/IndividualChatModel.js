@@ -1,16 +1,13 @@
-// models/ChatMessage.js
+//models/Chat/IndividualChatModel.js
 
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
-const { IndividualChatFetchDTO } = require("../../dtos/ChatDTO");
-const {
-  CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
+const { CustomError } = require("../../services");
 const {
   UserLastChatDTO,
-  UserFetchDTO,
   UserChatDTO,
-} = require("../../dtos/UserDTO");
+  IndividualChatFetchDTO,
+} = require("../../dtos");
 
 const individualChatMessageSchema = new mongoose.Schema({
   sender: {

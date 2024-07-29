@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { logger } = require("../../src/services/logHandlers/HandleWinston");
+const { logger } = require("../../src/services");
 
 const connectToDatabase = async () => {
   const uri = `${process.env.MONGOOSE_URI}/${process.env.DATABASE_NAME}`;
@@ -20,4 +20,4 @@ const connectToDatabase = async () => {
   }
 };
 
-module.exports = connectToDatabase;
+module.exports = { connectToDatabase };

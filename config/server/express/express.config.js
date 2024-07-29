@@ -1,13 +1,14 @@
 const express = require("express");
-const { initializeCors } = require("../../cors/cors.config");
-const { initializeMulter } = require("../../multer/multer.config");
-const { initializeHelmet } = require("../../helmet/helmet.config");
-const { initializeMonitoring } = require("../../monitorings/prometheus.config");
 
-const { MainRouter } = require("../../../src/routes/Main/MainRouter");
 const {
-  globalErrorHandler,
-} = require("../../../src/services/responseHandlers/HandleResponse");
+  initializeCors,
+  initializeMonitoring,
+  initializeHelmet,
+  initializeMulter,
+} = require("../../../config");
+
+const { globalErrorHandler } = require("../../../src/services");
+const { MainRouter } = require("../../../src/routes");
 
 const configureApp = (server) => {
   // Initialize Express app

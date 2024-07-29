@@ -1,22 +1,15 @@
-const User = require("../../models/User/UserModel");
+//controllers/User/UserController.js
+const { User } = require("../../models");
+const { asyncHandler } = require("../../middlewares");
 const {
   handleFileUpload,
-} = require("../../services/fileHandlers/HandleFileUpload");
-const {
   sendOTP,
   validateOTP,
-} = require("../../services/otpHandlers/HandleOTP");
-const { asyncHandler } = require("../../middlewares/AsyncHandler");
-const { logger } = require("../../services/logHandlers/HandleWinston");
-const {
   hashPassword,
-} = require("../../services/encryptionHandlers/HandleBcrypt");
-const {
   sendResponse,
-} = require("../../services/responseHandlers/HandleResponse");
-const {
   ObjectIdChecker,
-} = require("../../services/validationHandlers/ObjectIdChecker");
+  logger,
+} = require("../../services");
 
 // Login User using mongoose
 const loginUser = async (req, res) => {

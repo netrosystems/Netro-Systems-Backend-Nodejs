@@ -1,15 +1,13 @@
-// group model
+//models/Group/GroupModel.js
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
-const { GroupDTO } = require("../../dtos/GroupDTO");
-const User = require("../User/UserModel");
-const {
-  CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
+const User = require("../../models");
+const { GroupDTO } = require("../../dtos");
+const { CustomError } = require("../../services");
 const {
   handleGroupJoinNotification,
   handleGroupLeaveNotification,
-} = require("../../chats/NotificationModule");
+} = require("../../notifications");
 
 const groupSchema = new mongoose.Schema({
   owner: {

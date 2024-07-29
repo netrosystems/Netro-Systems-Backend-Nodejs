@@ -1,6 +1,6 @@
 const { createServer } = require("http");
-const { configureApp } = require("../express/express.config");
 const { initializeSocket } = require("../socket/socket.config");
+const { configureApp } = require("../express/express.config");
 
 const app = configureApp();
 

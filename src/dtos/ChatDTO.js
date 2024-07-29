@@ -66,18 +66,6 @@ class ChatFetchDTO {
   }
 }
 
-// //individual chat fetch dto
-// class IndividualChatFetchDTO {
-//   constructor(chat) {
-//     this._id = chat?._id || null;
-//     this.sender = chat?.sender ? new UserChatDTO(chat.sender) : null;
-//     this.receiver = chat?.receiver ? new UserChatDTO(chat.receiver) : null;
-//     this.message = chat?.message || "";
-//     this.attachment = chat?.attachment || "";
-//     this.createdAt = chat?.createdAt || null;
-//   }
-// }
-
 //individual chat fetch dto
 class IndividualChatFetchDTO {
   constructor(userId, chat) {
@@ -128,7 +116,6 @@ class EventChatFetchDTO {
 module.exports = {
   GroupChatDTO,
   GroupFetchDTO,
-  // ChatDTO,
   ChatFetchDTO,
   IndividualChatFetchDTO,
   GroupChatFetchDTO,

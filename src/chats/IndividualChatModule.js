@@ -1,9 +1,7 @@
-//chat module
-
+//chat/IndividualChatModule.js
 const { Timekoto } = require("timekoto");
-const IndividualChatMessage = require("../models/Chat/IndividualChatModel");
-const { logger } = require("../services/logHandlers/HandleWinston");
-const { CustomError } = require("../services/responseHandlers/HandleResponse");
+const IndividualChatMessage = require("../models");
+const { logger, CustomError } = require("../services");
 
 async function handleIndividualMessage(io, data) {
   try {
@@ -28,7 +26,7 @@ async function handleIndividualMessage(io, data) {
     });
 
     //save the message to the database
-    const newMessage = await IndividualChatMessage.addIndividualChatMessage(
+    await IndividualChatMessage.addIndividualChatMessage(
       processedData
     );
 

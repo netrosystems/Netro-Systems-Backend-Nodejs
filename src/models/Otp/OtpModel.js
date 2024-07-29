@@ -1,3 +1,5 @@
+//models/Otp/OTPModel.js
+
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
 

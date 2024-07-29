@@ -1,10 +1,7 @@
-const Group = require("../../models/Group/GroupModel");
-const { logger } = require("../../services/logHandlers/HandleWinston");
-const {
-  sendResponse,
-} = require("../../services/responseHandlers/HandleResponse");
-const { asyncHandler } = require("../../middlewares/AsyncHandler");
-const GroupChatMessage = require("../../models/Chat/GroupChatModel");
+//controllers/Chat/GroupChatController.js
+const { logger, sendResponse } = require("../../services");
+const { GroupChatMessage, Group } = require("../../models");
+const { asyncHandler } = require("../../middlewares");
 
 //get all group chat by user with last message
 const getAllGroupsJoinedByUserWithLastMessage = async (req, res) => {

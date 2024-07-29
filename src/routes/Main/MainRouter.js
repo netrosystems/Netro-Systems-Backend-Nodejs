@@ -1,3 +1,5 @@
+//router/Main/MainRouter.js
+
 const MainRouter = require("express").Router();
 
 //import routes
@@ -15,7 +17,8 @@ MainRouter.use("/groups", GroupRouter);
 MainRouter.use("/chats", ChatRouter);
 MainRouter.use("/notifications", NotificationRouter);
 
-//routes
+//default routes
 MainRouter.use(DefaultRouter);
 
+//export router
 module.exports = { MainRouter };

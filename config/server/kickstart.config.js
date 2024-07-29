@@ -1,7 +1,7 @@
+const { connectToDatabase } = require("../../config");
+const { logger } = require("../../src/services");
 const { httpServer } = require("./http/http.config");
-const connectToDatabase = require("../databases/mongoose.config");
-const { logger } = require("../../src/services/logHandlers/HandleWinston");
-const port = process.env.SERVER_PORT || 5000;
+const port = process.env.SERVER_PORT || 5005;
 
 //starting the server
 async function kickstartServer() {

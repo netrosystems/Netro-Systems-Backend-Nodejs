@@ -1,9 +1,7 @@
-const { logger } = require("../../services/logHandlers/HandleWinston");
-const {
-  sendResponse,
-} = require("../../services/responseHandlers/HandleResponse");
-const { asyncHandler } = require("../../middlewares/AsyncHandler");
-const IndividualChatMessage = require("../../models/Chat/IndividualChatModel");
+//controllers/Chat/IndividualChatController.js
+const { logger, sendResponse } = require("../../services");
+const { asyncHandler } = require("../../middlewares");
+const IndividualChatMessage = require("../../models");
 
 //get users whom the user has chatted with
 const getIndivualChattedUsers = async (req, res) => {

@@ -11,4 +11,4 @@ const getServerBaseUrl = (req) => {
   return serverBaseUrl;
 };
 
-module.exports = getServerBaseUrl;
+module.exports = { getServerBaseUrl };

@@ -2,7 +2,7 @@ const fs = require("fs").promises; // Using the promises version of fs
 const path = require("path");
 const mime = require("mime-types");
 const { UniqueNaam } = require("uniquenaam/uniquenaam");
-const getServerBaseUrl = require("../urlHandlers/HandleBaseUrl");
+const { getServerBaseUrl } = require("../urlHandlers/HandleBaseUrl");
 const {
   compressImage,
 } = require("../fileModificationHandlers/HandleCompression");
@@ -26,7 +26,6 @@ const handleFileUpload = async ({ req, files, folderName }) => {
       // Check if the uploaded file is an image
       const mimeType = mime.lookup(file.originalname);
       if (mimeType && mimeType.startsWith("image/")) {
-        
         //compress only image files
         const compressedSource = await compressImage(source);
 
