@@ -29,12 +29,13 @@ const configureApp = (server) => {
   // Initialize Multer
   initializeMulter(app);
 
-  // Routes
+  // Middleware for routing
   app.use(MainRouter);
 
-  // Global Error Handling Middleware
+  // Middleware for Global Error Handling
   app.use(globalErrorHandler);
 
+  // Return the configured app
   return app;
 };
 

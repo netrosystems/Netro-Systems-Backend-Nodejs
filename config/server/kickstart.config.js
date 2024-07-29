@@ -1,6 +1,6 @@
-const { connectToDatabase } = require("../../config");
 const { logger } = require("../../src/services");
 const { httpServer } = require("./http/http.config");
+const { connectToDatabase } = require("../../config");
 const port = process.env.SERVER_PORT || 5005;
 
 //starting the server

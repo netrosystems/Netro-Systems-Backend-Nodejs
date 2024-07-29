@@ -12,6 +12,7 @@ const {
   getMetrics,
 } = require("../config/monitorings/prometheus.config");
 const { initializeMulter } = require("../config/multer/multer.config");
+const { initializeEnv } = require("../config/env/env.config");
 
 module.exports = {
   allowedOrigins,
@@ -22,4 +23,5 @@ module.exports = {
   initializeMonitoring,
   getMetrics,
   initializeMulter,
+  initializeEnv,
 };
