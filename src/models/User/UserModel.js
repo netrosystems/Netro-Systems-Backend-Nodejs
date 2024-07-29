@@ -1,7 +1,9 @@
-// models/UserModel.js
+//models/User/UserModel.js
 
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
+const { ENUM_USER_PROVIDER } = require("../../constants/UserConstants");
+const { friendsListSchema, locationSchema } = require("./UserSubschemas");
 const {
   UserLoginDTO,
   UserRegisterDTO,
@@ -9,22 +11,14 @@ const {
   UserFetchDTO,
   UserFriendlistDTO,
   UserFetchWithFriendshipStatusDTO,
-} = require("../../dtos/UserDTO");
-const { generateToken } = require("../../services/tokenHandlers/HandleJwt");
-const { validateOTP } = require("../../services/otpHandlers/HandleOTP");
-const {
-  hashPassword,
-  comparePasswords,
-} = require("../../services/encryptionHandlers/HandleBcrypt");
-const { friendsListSchema, locationSchema } = require("./UserSubschemas");
+} = require("../../dtos");
 const {
   CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
-const { ENUM_USER_PROVIDER } = require("../../constants/UserConstants");
-const {
-  handleFriendRequestNotification,
-  handleAcceptedFriendRequestNotification,
-} = require("../../chats/NotificationModule");
+  hashPassword,
+  comparePasswords,
+  generateToken,
+  validateOTP,
+} = require("../../services");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -803,17 +797,6 @@ userSchema.statics.sendOneFriendRequest = async function ({
     user.friendsList.push({ userId: friendId, status: "sent" });
     friend.friendsList.push({ userId: userId, status: "received" });
 
-    // Emit the friend request notification
-    const dataForNotification = {
-      senderId: userId,
-      senderName: user?.fullName,
-      senderImage: user?.profileImage,
-      receiverId: friendId,
-      entityId: userId,
-      entityType: "user",
-    };
-    await handleFriendRequestNotification(dataForNotification);
-
     // Save changes
     await user.save({ session });
     await friend.save({ session });
@@ -890,17 +873,6 @@ userSchema.statics.acceptOneFriendRequest = async function ({
     // Accept the friend request
     friendRequest.status = "accepted";
     userRequest.status = "accepted";
-
-    // Emit the friend request accepted notification
-    const dataForNotification = {
-      senderId: userId,
-      senderName: user?.fullName,
-      senderImage: user?.profileImage,
-      receiverId: friendId,
-      entityId: userId,
-      entityType: "user",
-    };
-    await handleAcceptedFriendRequestNotification(dataForNotification);
 
     // Save changes
     await user.save({ session });

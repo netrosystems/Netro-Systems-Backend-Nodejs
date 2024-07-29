@@ -1,5 +1,7 @@
+//router/Group/GroupRoutes.js
+
 const GroupRouter = require("express").Router();
-const { authorizeRequest } = require("../../middlewares/AuthorizeRequest");
+const { authorizeRequest } = require("../../middlewares");
 const {
   getAllGroups,
   getAllGroupsOwnedByUser,
@@ -13,6 +15,7 @@ const {
   deleteOneGroupById,
 } = require("../../controllers/Group/GroupController");
 
+//routes
 GroupRouter.get("/all", authorizeRequest, getAllGroups);
 GroupRouter.get("/get-own-groups", authorizeRequest, getAllGroupsOwnedByUser);
 GroupRouter.get(
@@ -28,4 +31,6 @@ GroupRouter.patch("/join/:id", authorizeRequest, joinGroupById);
 GroupRouter.patch("/leave/:id", authorizeRequest, leaveGroupById);
 GroupRouter.delete("/delete/:id", authorizeRequest, deleteOneGroupById);
 
+
+//export router
 module.exports = GroupRouter;

@@ -1,9 +1,7 @@
-//cors config
+// config/cors/cors.config.js
+
 const cors = require("cors");
-const {
-  CustomError,
-} = require("../../src/services/responseHandlers/HandleResponse");
-const { logger } = require("../../src/services/logHandlers/HandleWinston");
+const { logger, CustomError } = require("../../src/services");
 
 const allowedOrigins = [
   //for development

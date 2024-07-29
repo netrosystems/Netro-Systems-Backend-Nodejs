@@ -1,15 +1,18 @@
+// config/server/express/express.config.js
+
 const express = require("express");
-const { initializeCors } = require("../../cors/cors.config");
-const { initializeMulter } = require("../../multer/multer.config");
-const { initializeHelmet } = require("../../helmet/helmet.config");
-const { initializeMonitoring } = require("../../monitorings/prometheus.config");
 
-const { MainRouter } = require("../../../src/routes/Main/MainRouter");
 const {
-  globalErrorHandler,
-} = require("../../../src/services/responseHandlers/HandleResponse");
+  initializeCors,
+  initializeMonitoring,
+  initializeHelmet,
+  initializeMulter,
+} = require("../../../config");
 
-const configureApp = (server) => {
+const { globalErrorHandler } = require("../../../src/services");
+const { MainRouter } = require("../../../src/routes");
+
+const initializeExpress = () => {
   // Initialize Express app
   const app = express();
 
@@ -28,13 +31,14 @@ const configureApp = (server) => {
   // Initialize Multer
   initializeMulter(app);
 
-  // Routes
+  // Middleware for routing
   app.use(MainRouter);
 
-  // Global Error Handling Middleware
+  // Middleware for Global Error Handling
   app.use(globalErrorHandler);
 
+  // Return the configured app
   return app;
 };
 
-module.exports = { configureApp };
+module.exports = { initializeExpress };

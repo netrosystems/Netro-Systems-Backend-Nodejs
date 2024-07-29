@@ -1,17 +1,14 @@
-// Controllers/GroupController.js
-const { logger } = require("../../services/logHandlers/HandleWinston");
-const Group = require("../../models/Group/GroupModel");
+// controllers/Group/GroupController.js
+
 const {
+  logger,
   ObjectIdChecker,
-} = require("../../services/validationHandlers/ObjectIdChecker");
-const {
   sendResponse,
   CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
-const { asyncHandler } = require("../../middlewares/AsyncHandler");
-const {
   handleFileUpload,
-} = require("../../services/fileHandlers/HandleFileUpload");
+} = require("../../services");
+const Group = require("../../models");
+const { asyncHandler } = require("../../middlewares");
 
 //get all Group using mongoose
 const getAllGroups = async (req, res) => {
@@ -50,7 +47,7 @@ const getGroupsByKeyword = async (req, res) => {
       `keyword is needed on params, use "all" for all groups without any filter!`
     );
   }
-  const groups = await Group.getGroupsByKeyword({keyword, userId});
+  const groups = await Group.getGroupsByKeyword({ keyword, userId });
   if (!groups?.length) {
     return sendResponse(res, 404, "No groups found based on keyword", groups);
   }

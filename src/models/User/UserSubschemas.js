@@ -1,3 +1,5 @@
+//models/User/UserSubschemas.js
+
 const mongoose = require("mongoose");
 
 //friends list schema

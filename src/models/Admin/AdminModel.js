@@ -1,4 +1,4 @@
-// models/AdminModel.js
+//models/Admin/AdminModel.js
 
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
@@ -7,20 +7,13 @@ const {
   AdminRegisterDTO,
   AdminUpdateDTO,
   AdminFetchDTO,
-} = require("../../dtos/AdminDTO");
-const { generateToken } = require("../../services/tokenHandlers/HandleJwt");
-// const { validateOTP } = require("../../services/otpHandlers/HandleOTP");
-// const {
-//   hashPassword,
-//   comparePasswords,
-// } = require("../../services/encryptionHandlers/HandleBcrypt");
-const {
-  CustomError,
-} = require("../../services/responseHandlers/HandleResponse");
+} = require("../../dtos");
 const {
   hashPassword,
   comparePasswords,
-} = require("../../services/encryptionHandlers/HandleBcrypt");
+  CustomError,
+  generateToken,
+} = require("../../services");
 
 const adminSchema = new mongoose.Schema({
   email: {

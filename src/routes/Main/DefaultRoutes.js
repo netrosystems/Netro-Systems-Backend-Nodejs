@@ -1,16 +1,16 @@
+//router/Main/DefaultRoutes.js
+
 // Init the default routes for the server
 const express = require("express");
 const path = require("path");
 const DefaultRouter = require("express").Router();
-const { getMetrics } = require("../../../config/monitorings/prometheus.config");
-const { logger } = require("../../services/logHandlers/HandleWinston");
+const { getMetrics } = require("../../../config");
 const {
   sendResponse,
   sendError,
-} = require("../../services/responseHandlers/HandleResponse");
-const {
   handleFileUpload,
-} = require("../../services/fileHandlers/HandleFileUpload");
+  logger,
+} = require("../../services");
 
 // Default route
 DefaultRouter.get("/", (req, res) => {
@@ -25,10 +25,10 @@ DefaultRouter.get("/metrics", getMetrics);
 DefaultRouter.post("/upload", async (req, res) => {
   try {
     if (!req.files || Object.keys(req.files).length === 0) {
-      return sendError(res, 400, "No chat attachment found to be uploaded!");
+      return sendError(res, 400, "No attachment found to be uploaded!");
     }
     if (!req.files.single) {
-      return sendError(res, 400, "No chat attachment found to be uploaded!");
+      return sendError(res, 400, "No attachment found to be uploaded!");
     }
     const folderName = "attachments";
     //upload file
@@ -40,7 +40,7 @@ DefaultRouter.post("/upload", async (req, res) => {
     //get the first attachment url
     const attachment = fileUrls[0];
     //send response
-    sendResponse(res, 200, "Chat attachment uploaded successfully!", {
+    sendResponse(res, 200, "Attachment uploaded successfully!", {
       attachmentUrl: attachment,
     });
   } catch (error) {
@@ -59,4 +59,5 @@ DefaultRouter.use((req, res) => {
   sendError(res, 404, "Route not found");
 });
 
+//export the router
 module.exports = DefaultRouter;
