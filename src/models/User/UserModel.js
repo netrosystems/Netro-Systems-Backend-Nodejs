@@ -19,10 +19,6 @@ const {
   generateToken,
   validateOTP,
 } = require("../../services");
-const {
-  handleFriendRequestNotification,
-  handleAcceptedFriendRequestNotification,
-} = require("../../notifications");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -801,17 +797,6 @@ userSchema.statics.sendOneFriendRequest = async function ({
     user.friendsList.push({ userId: friendId, status: "sent" });
     friend.friendsList.push({ userId: userId, status: "received" });
 
-    // Emit the friend request notification
-    const dataForNotification = {
-      senderId: userId,
-      senderName: user?.fullName,
-      senderImage: user?.profileImage,
-      receiverId: friendId,
-      entityId: userId,
-      entityType: "user",
-    };
-    await handleFriendRequestNotification(dataForNotification);
-
     // Save changes
     await user.save({ session });
     await friend.save({ session });
@@ -888,17 +873,6 @@ userSchema.statics.acceptOneFriendRequest = async function ({
     // Accept the friend request
     friendRequest.status = "accepted";
     userRequest.status = "accepted";
-
-    // Emit the friend request accepted notification
-    const dataForNotification = {
-      senderId: userId,
-      senderName: user?.fullName,
-      senderImage: user?.profileImage,
-      receiverId: friendId,
-      entityId: userId,
-      entityType: "user",
-    };
-    await handleAcceptedFriendRequestNotification(dataForNotification);
 
     // Save changes
     await user.save({ session });

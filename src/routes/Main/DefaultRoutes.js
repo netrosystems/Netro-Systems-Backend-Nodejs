@@ -25,10 +25,10 @@ DefaultRouter.get("/metrics", getMetrics);
 DefaultRouter.post("/upload", async (req, res) => {
   try {
     if (!req.files || Object.keys(req.files).length === 0) {
-      return sendError(res, 400, "No chat attachment found to be uploaded!");
+      return sendError(res, 400, "No attachment found to be uploaded!");
     }
     if (!req.files.single) {
-      return sendError(res, 400, "No chat attachment found to be uploaded!");
+      return sendError(res, 400, "No attachment found to be uploaded!");
     }
     const folderName = "attachments";
     //upload file
@@ -40,7 +40,7 @@ DefaultRouter.post("/upload", async (req, res) => {
     //get the first attachment url
     const attachment = fileUrls[0];
     //send response
-    sendResponse(res, 200, "Chat attachment uploaded successfully!", {
+    sendResponse(res, 200, "Attachment uploaded successfully!", {
       attachmentUrl: attachment,
     });
   } catch (error) {

@@ -1,4 +1,5 @@
-//controllers/Group/GroupController.js
+// controllers/Group/GroupController.js
+
 const {
   logger,
   ObjectIdChecker,

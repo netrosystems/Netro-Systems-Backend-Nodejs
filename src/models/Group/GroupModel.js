@@ -4,10 +4,6 @@ const { Timekoto } = require("timekoto");
 const User = require("../../models");
 const { GroupDTO } = require("../../dtos");
 const { CustomError } = require("../../services");
-const {
-  handleGroupJoinNotification,
-  handleGroupLeaveNotification,
-} = require("../../notifications");
 
 const groupSchema = new mongoose.Schema({
   owner: {
@@ -393,19 +389,6 @@ groupSchema.statics.joinGroupById = async function ({ groupId, userId }) {
       throw new CustomError(500, "Failed to join group");
     }
 
-    //emit the friend request notification to the receiver
-    const joiner = await User.findById(userId).lean();
-    const dataForNotification = {
-      senderId: userId,
-      senderName: joiner?.fullName,
-      senderImage: joiner?.profileImage,
-      receiverId: group?.owner?._id?.toString(),
-      entityId: group?._id?.toString(),
-      entityType: "group",
-    };
-
-    handleGroupJoinNotification(dataForNotification);
-
     // Return the updated group
     return updatedGroup;
   } catch (error) {
@@ -443,19 +426,7 @@ groupSchema.statics.leaveGroupById = async function ({ groupId, userId }) {
     if (!updatedGroup) {
       throw new CustomError(500, "Failed to leave group");
     }
-
-    //emit the friend request notification to the receiver
-    const left = await User.findById(userId).lean();
-    const dataForNotification = {
-      senderId: userId,
-      senderName: left?.fullName,
-      senderImage: left?.profileImage,
-      receiverId: group?.owner?._id?.toString(),
-      entityId: group?._id?.toString(),
-      entityType: "group",
-    };
-
-    handleGroupLeaveNotification(dataForNotification);
+    
     // Return the updated group
     return updatedGroup;
   } catch (error) {

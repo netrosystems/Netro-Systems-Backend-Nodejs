@@ -1,4 +1,5 @@
-//controllers/Admin/AdminController.js
+// controllers/Admin/AdminController.js
+
 const { asyncHandler } = require("../../middlewares");
 const { Admin } = require("../../models");
 const {

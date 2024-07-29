@@ -2,7 +2,7 @@ const { logger } = require("../services/logHandlers/HandleWinston");
 const { verifyToken } = require("../services/tokenHandlers/HandleJwt");
 const Admin = require("../models/Admin/AdminModel");
 const User = require("../models/User/UserModel");
-const { AuthDTO } = require("../dtos/AuthDTO");
+const { AuthDTO } = require("../dtos");
 const {
   sendResponse,
   CustomError,

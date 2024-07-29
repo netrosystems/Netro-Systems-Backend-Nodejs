@@ -1,3 +1,5 @@
+// config/server/express/express.config.js
+
 const express = require("express");
 
 const {
@@ -10,7 +12,7 @@ const {
 const { globalErrorHandler } = require("../../../src/services");
 const { MainRouter } = require("../../../src/routes");
 
-const configureApp = (server) => {
+const initializeExpress = () => {
   // Initialize Express app
   const app = express();
 
@@ -39,4 +41,4 @@ const configureApp = (server) => {
   return app;
 };
 
-module.exports = { configureApp };
+module.exports = { initializeExpress };

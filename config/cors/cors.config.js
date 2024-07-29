@@ -1,4 +1,5 @@
-//cors config
+// config/cors/cors.config.js
+
 const cors = require("cors");
 const { logger, CustomError } = require("../../src/services");
 

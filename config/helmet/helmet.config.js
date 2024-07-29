@@ -1,4 +1,5 @@
-// helmetConfig.js
+// config/helmet/helmet.config.js
+
 const helmet = require("helmet");
 
 const initializeHelmet = (app) => {
