@@ -1,3 +1,5 @@
+// config/emails/nodemailer.config.js
+
 const nodemailer = require("nodemailer");
 
 const nodemailerTransporter = nodemailer.createTransport({

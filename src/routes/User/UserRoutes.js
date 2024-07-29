@@ -1,9 +1,11 @@
+//router/User/UserRoutes.js
+
+const UserRouter = require("express").Router();
 const {
-  authorizeAdmin,
   authorizeRequest,
   isUserAccessingOwnData,
-} = require("../../middlewares/AuthorizeRequest");
-const UserRouter = require("express").Router();
+  loginRateLimiter,
+} = require("../../middlewares");
 
 const {
   getOneUser,
@@ -29,8 +31,8 @@ const {
   cancelOrRemoveFriend,
   modifyCurrentLocation,
 } = require("../../controllers/User/UserController");
-const { loginRateLimiter } = require("../../middlewares/RateLimiters");
 
+//routes
 UserRouter.get("/find/:id", authorizeRequest, getOneUser);
 UserRouter.get("/search/:keyword", authorizeRequest, getUserByKeyword);
 UserRouter.get("/name/:name", authorizeRequest, getUserByName);
@@ -89,4 +91,5 @@ UserRouter.delete(
 );
 UserRouter.patch("/update-location", authorizeRequest, modifyCurrentLocation);
 
+//export router
 module.exports = UserRouter;

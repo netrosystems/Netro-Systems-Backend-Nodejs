@@ -1,22 +1,16 @@
-const Admin = require("../../models/Admin/AdminModel");
-const {
-  handleFileUpload,
-} = require("../../services/fileHandlers/HandleFileUpload");
-const {
-  sendOTP,
-  validateOTP,
-} = require("../../services/otpHandlers/HandleOTP");
-const {
-  sendResponse,
-} = require("../../services/responseHandlers/HandleResponse");
-const { asyncHandler } = require("../../middlewares/AsyncHandler");
-const { logger } = require("../../services/logHandlers/HandleWinston");
-const {
-  hashPassword,
-} = require("../../services/encryptionHandlers/HandleBcrypt");
+// controllers/Admin/AdminController.js
+
+const { asyncHandler } = require("../../middlewares");
+const { Admin } = require("../../models");
 const {
   ObjectIdChecker,
-} = require("../../services/validationHandlers/ObjectIdChecker");
+  handleFileUpload,
+  validateOTP,
+  sendOTP,
+  sendResponse,
+  logger,
+  hashPassword,
+} = require("../../services");
 
 // Login Admin using mongoose
 const loginAdmin = async (req, res) => {

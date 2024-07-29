@@ -1,8 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const {
-  nodemailerTransporter,
-} = require("../../../config/emails/nodemailer.config");
 
 const sendPasswordResetOTPEmail = async ({ email, code }) => {
   try {
