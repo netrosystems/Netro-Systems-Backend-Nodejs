@@ -3,10 +3,8 @@
 const { asyncHandler } = require("../../../middlewares");
 const { BlogCategory } = require("../../../models");
 const {
-  handleFileUpload,
   sendResponse,
   ObjectIdChecker,
-  logger,
   CustomError,
 } = require("../../../services");
 

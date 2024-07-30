@@ -7,6 +7,7 @@ const User = require("./User/UserModel");
 const Blog = require("./Content/Blog/BlogModel");
 const BlogCategory = require("./Content/Blog/BlogCategoryModel");
 const Service = require("./Content/Service/ServiceModel");
+const Portfolio = require("./Content/Portfolio/PortfolioModel");
 
 module.exports = {
   Admin,
@@ -16,4 +17,5 @@ module.exports = {
   Blog,
   BlogCategory,
   Service,
+  Portfolio,
 };

@@ -6,7 +6,6 @@ const {
   handleFileUpload,
   sendResponse,
   ObjectIdChecker,
-  logger,
   CustomError,
 } = require("../../../services");
 
