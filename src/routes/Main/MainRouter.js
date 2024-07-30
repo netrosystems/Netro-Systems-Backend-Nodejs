@@ -11,6 +11,7 @@ const UserRouter = require("../User/UserRoutes");
 const GroupRouter = require("../Group/GroupRoutes");
 const BlogRouter = require("../Content/BlogRoutes");
 const BlogCategoryRouter = require("../Content/BlogCategoryRoutes");
+const ServiceRouter = require("../Content/ServiceRoutes");
 
 //routes with prefixes
 MainRouter.use("/admins", AdminRouter);
@@ -18,6 +19,7 @@ MainRouter.use("/users", UserRouter);
 MainRouter.use("/groups", GroupRouter);
 MainRouter.use("/blogs", BlogRouter);
 MainRouter.use("/blog-categories", BlogCategoryRouter);
+MainRouter.use("/services", ServiceRouter);
 
 //default routes
 MainRouter.use(DefaultRouter);

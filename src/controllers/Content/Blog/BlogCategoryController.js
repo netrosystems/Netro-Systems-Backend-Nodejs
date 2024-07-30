@@ -1,4 +1,5 @@
-//controllers/Content/Category/CategoryController.js
+// controllers/Content/Blog/BlogCategoryController.js
+
 const { asyncHandler } = require("../../../middlewares");
 const { BlogCategory } = require("../../../models");
 const {
