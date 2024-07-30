@@ -1,9 +1,9 @@
-// models/Blog.js
+// models/Service.js
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
 const { CustomError } = require("../../../services");
 
-const blogSchema = new mongoose.Schema({
+const serviceSchema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin",
@@ -66,113 +66,116 @@ const blogSchema = new mongoose.Schema({
 });
 
 // Middleware to update `updatedAt` on every save
-blogSchema.pre("save", function (next) {
+serviceSchema.pre("save", function (next) {
   this.updatedAt = () => Timekoto();
   next();
 });
 
-// Define a static method to get all blogs
-blogSchema.statics.getAllBlogs = async function () {
+// Define a static method to get all services
+serviceSchema.statics.getAllServices = async function () {
   try {
-    // Find all blogs and populate the blogedBy field while excluding the password field
-    const blogs = await this.find()
+    // Find all services and populate the serviceedBy field while excluding the password field
+    const services = await this.find()
       .sort({ createdAt: -1 })
       .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No blogs found");
+    if (services?.length === 0) {
+      throw new CustomError(404, "No services found");
     }
 
-    // Return blogs
-    return blogs;
+    // Return services
+    return services;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-// Define a static method to get one blog by id
-blogSchema.statics.getOneBlog = async function (blogId) {
+// Define a static method to get one service by id
+serviceSchema.statics.getOneService = async function (serviceId) {
   try {
-    // Find blog by id and populate the blogedBy field while excluding the password field
-    const blog = await this.findById(blogId).populate("author", {
+    // Find service by id and populate the serviceedBy field while excluding the password field
+    const service = await this.findById(serviceId).populate("author", {
       fullName: 1,
       profileImage: 1,
       _id: 0,
     });
 
-    if (!blog) {
-      throw new CustomError(404, "Blog not found");
+    if (!service) {
+      throw new CustomError(404, "Service not found");
     }
 
-    // Return blog
-    return blog;
+    // Return service
+    return service;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-// Define a static method to create a blog
-blogSchema.statics.createOneBlog = async function (blogData) {
+// Define a static method to create a service
+serviceSchema.statics.createOneService = async function (serviceData) {
   try {
-    // Create blog
-    const blog = await this.create(blogData);
+    // Create service
+    const service = await this.create(serviceData);
 
-    await blog.populate("author", {
+    await service.populate("author", {
       fullName: 1,
       profileImage: 1,
       _id: 0,
     });
 
-    // Return blog
-    return blog;
+    // Return service
+    return service;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-// Define a static method to update a blog by id
-blogSchema.statics.updateOneBlog = async function ({ blogId, updatedData }) {
+// Define a static method to update a service by id
+serviceSchema.statics.updateOneService = async function ({
+  serviceId,
+  updatedData,
+}) {
   try {
-    // Find blog by id and update
-    const blog = await this.findByIdAndUpdate(blogId, updatedData, {
+    // Find service by id and update
+    const service = await this.findByIdAndUpdate(serviceId, updatedData, {
       new: true,
       runValidators: true,
     });
 
-    if (!blog) {
-      throw new CustomError(404, "Blog not found");
+    if (!service) {
+      throw new CustomError(404, "Service not found");
     }
 
-    await blog.populate("author", {
+    await service.populate("author", {
       fullName: 1,
       profileImage: 1,
       _id: 0,
     });
 
-    // Return blog
-    return blog;
+    // Return service
+    return service;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-// Define a static method to delete a blog by id
-blogSchema.statics.deleteOneBlog = async function (blogId) {
+// Define a static method to delete a service by id
+serviceSchema.statics.deleteOneService = async function (serviceId) {
   try {
-    // Find blog by id and delete
-    const blog = await this.findByIdAndDelete(blogId);
+    // Find service by id and delete
+    const service = await this.findByIdAndDelete(serviceId);
 
-    if (!blog) {
-      throw new CustomError(404, "Blog not found");
+    if (!service) {
+      throw new CustomError(404, "Service not found");
     }
 
-    // Return blog
-    return blog;
+    // Return service
+    return service;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-const Blog = mongoose.model("Blog", blogSchema);
+const Service = mongoose.model("Service", serviceSchema);
 
-module.exports = Blog;
+module.exports = Service;
