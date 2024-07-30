@@ -68,7 +68,7 @@ const registerUser = async (req, res) => {
 
 //login or register using provider
 const loginOrRegisterProvider = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = JSON.parse(req?.body?.data) ? JSON.parse(req?.body?.data) : {};
   const { id, email, photoUrl, provider, displayName } = data;
   if (!id || !email || !provider || !displayName) {
     return sendResponse(

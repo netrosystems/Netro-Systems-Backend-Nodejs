@@ -2,16 +2,26 @@
 
 const MainRouter = require("express").Router();
 
-//import routes
+//default route
 const DefaultRouter = require("./DefaultRoutes");
+
+//import routes
 const AdminRouter = require("../Admin/AdminRoutes");
 const UserRouter = require("../User/UserRoutes");
 const GroupRouter = require("../Group/GroupRoutes");
+const BlogRouter = require("../Content/BlogRoutes");
+const BlogCategoryRouter = require("../Content/BlogCategoryRoutes");
+const ServiceRouter = require("../Content/ServiceRoutes");
+const PortfolioRouter = require("../Content/PortfolioRoutes");
 
 //routes with prefixes
 MainRouter.use("/admins", AdminRouter);
 MainRouter.use("/users", UserRouter);
 MainRouter.use("/groups", GroupRouter);
+MainRouter.use("/blogs", BlogRouter);
+MainRouter.use("/blog-categories", BlogCategoryRouter);
+MainRouter.use("/services", ServiceRouter);
+MainRouter.use("/protfolios", PortfolioRouter);
 
 //default routes
 MainRouter.use(DefaultRouter);
