@@ -5,6 +5,7 @@ const Group = require("./Group/GroupModel");
 const OTP = require("./Otp/OtpModel");
 const User = require("./User/UserModel");
 const Blog = require("./Content/Blog/BlogModel");
+const BlogCategory = require("./Content/Blog/BlogCategoryModel");
 
 module.exports = {
   Admin,
@@ -12,4 +13,5 @@ module.exports = {
   OTP,
   User,
   Blog,
+  BlogCategory,
 };
