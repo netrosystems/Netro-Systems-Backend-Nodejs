@@ -13,6 +13,7 @@ const BlogRouter = require("../Content/BlogRoutes");
 const BlogCategoryRouter = require("../Content/BlogCategoryRoutes");
 const ServiceRouter = require("../Content/ServiceRoutes");
 const PortfolioRouter = require("../Content/PortfolioRoutes");
+const PortfolioCategoryRouter = require("../Content/PortfolioCategoryRoutes");
 
 //routes with prefixes
 MainRouter.use("/admins", AdminRouter);
@@ -22,6 +23,7 @@ MainRouter.use("/blogs", BlogRouter);
 MainRouter.use("/blog-categories", BlogCategoryRouter);
 MainRouter.use("/services", ServiceRouter);
 MainRouter.use("/protfolios", PortfolioRouter);
+MainRouter.use("/portfolio-categories", PortfolioCategoryRouter);
 
 //default routes
 MainRouter.use(DefaultRouter);
