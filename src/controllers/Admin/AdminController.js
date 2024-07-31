@@ -14,7 +14,7 @@ const {
 
 // Login Admin using mongoose
 const loginAdmin = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { email, password } = data;
   const result = await Admin.login({ email, password });
   logger.log("info", `Admin logged in: ${email}`);
@@ -23,7 +23,8 @@ const loginAdmin = async (req, res) => {
 
 // Register Admin using mongoose
 const registerAdmin = async (req, res) => {
-  const { fullName, email, password } = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
+  const { fullName, email, password } = data;
   if (!fullName || !email || !password) {
     return sendResponse(res, 400, "Missing required fields");
   }
@@ -94,7 +95,7 @@ const updateAdminById = async (req, res) => {
 
 // Send password reset OTP
 const sendPasswordResetOTP = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { email } = data;
   //check if email exists
   const admin = await Admin.findOne({ email });
@@ -112,7 +113,7 @@ const sendPasswordResetOTP = async (req, res) => {
 };
 
 const validatePasswordResetOTP = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { otp, email } = data;
   if (!otp || !email) {
     return sendResponse(res, 400, "All fields are required");
@@ -134,7 +135,7 @@ const validatePasswordResetOTP = async (req, res) => {
 
 // Update admin password by OTP
 const updateAdminPasswordByOTP = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { otp, email, newPassword } = data;
 
   const updatedAdmin = await Admin.updatePasswordByOTP({
@@ -152,7 +153,7 @@ const updateAdminPasswordByOTP = async (req, res) => {
 // Update admin password by old password
 const updateAdminPasswordByOldPassword = async (req, res) => {
   const email = req?.params?.email;
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { oldPassword, newPassword } = data;
 
   const updatedAdmin = await Admin.updatePasswordByEmail({

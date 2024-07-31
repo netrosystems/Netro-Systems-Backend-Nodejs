@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TOTP Demo</title>
+  </head>
+  <body>
+    <h1>TOTP (Two-Factor Authentication) Demo</h1>
+
+    <section id="generate-totp-section">
+      <h2>Generate TOTP and QR Code</h2>
+      <button id="generate-totp-btn">Generate TOTP</button>
+      <div id="qr-code"></div>
+      <p id="secret"></p>
+    </section>
+
+    <section id="verify-totp-section">
+      <h2>Verify TOTP Token</h2>
+      <form id="verify-totp-form">
+        <label for="token">Enter TOTP Token:</label>
+        <input type="text" id="token" name="token" required />
+        <input type="hidden" id="hidden-secret" name="secret" />
+        <button type="submit">Verify Token</button>
+      </form>
+      <p id="verification-result"></p>
+    </section>
+
+    <script>
+      const backendUrl = "http://localhost:5000"; // Update this with your backend URL
+
+      document
+        .getElementById("generate-totp-btn")
+        .addEventListener("click", () => {
+          fetch(`${backendUrl}/2fa/generate`, {
+            method: "GET",
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById(
+                "qr-code"
+              ).innerHTML = `<img src="${data.qrCode}" alt="QR Code">`;
+              document.getElementById(
+                "secret"
+              ).innerText = `Secret: ${data.secret}`;
+              document.getElementById("hidden-secret").value = data.secret;
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+
+      document
+        .getElementById("verify-totp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+
+          // Create a FormData object to handle multipart form data
+          const formData = new FormData();
+          formData.append(
+            "data",
+            JSON.stringify({
+              token: document.getElementById("token").value,
+              secret: document.getElementById("hidden-secret").value,
+            })
+          );
+
+          fetch(`${backendUrl}/2fa/verify`, {
+            method: "POST",
+            body: formData, // Send as multipart/form-data
+          })
+            .then((response) => response.text())
+            .then((result) => {
+              document.getElementById("verification-result").innerText = result;
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+    </script>
+  </body>
+</html>

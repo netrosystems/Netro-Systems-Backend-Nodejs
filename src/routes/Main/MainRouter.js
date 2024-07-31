@@ -15,6 +15,7 @@ const ServiceRouter = require("../Content/ServiceRoutes");
 const PortfolioRouter = require("../Content/PortfolioRoutes");
 const PortfolioCategoryRouter = require("../Content/PortfolioCategoryRoutes");
 const TeamRouter = require("../Content/TeamRoutes");
+const faRouter = require("../Totp/TotpRoutes");
 
 //routes with prefixes
 MainRouter.use("/admins", AdminRouter);
@@ -26,6 +27,7 @@ MainRouter.use("/services", ServiceRouter);
 MainRouter.use("/protfolios", PortfolioRouter);
 MainRouter.use("/portfolio-categories", PortfolioCategoryRouter);
 MainRouter.use("/teams", TeamRouter);
+MainRouter.use("/2fa", faRouter);
 
 //default routes
 MainRouter.use(DefaultRouter);
