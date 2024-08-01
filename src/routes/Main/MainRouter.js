@@ -16,6 +16,7 @@ const PortfolioRouter = require("../Content/PortfolioRoutes");
 const PortfolioCategoryRouter = require("../Content/PortfolioCategoryRoutes");
 const TeamRouter = require("../Content/TeamRoutes");
 const JobRouter = require("../Content/JobRoutes");
+const JobCategoryRouter = require("../Content/JobCategoryRoutes");
 
 const faRouter = require("../Totp/TotpRoutes");
 
@@ -30,6 +31,7 @@ MainRouter.use("/protfolios", PortfolioRouter);
 MainRouter.use("/portfolio-categories", PortfolioCategoryRouter);
 MainRouter.use("/teams", TeamRouter);
 MainRouter.use("/jobs", JobRouter);
+MainRouter.use("/job-categories", JobCategoryRouter);
 
 MainRouter.use("/2fa", faRouter);
 
