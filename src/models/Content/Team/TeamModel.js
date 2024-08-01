@@ -3,6 +3,9 @@
 const mongoose = require("mongoose");
 const { Timekoto } = require("timekoto");
 const { CustomError } = require("../../../services");
+const {
+  generateQRCode,
+} = require("../../../services/qrCodeHandler/HandleQRCode");
 
 const teamSchema = new mongoose.Schema({
   author: {
@@ -45,6 +48,10 @@ const teamSchema = new mongoose.Schema({
     type: String,
     default: "https://via.placeholder.com/150",
     required: true,
+  },
+  qrCode: {
+    type: String,
+    default: null,
   },
   status: {
     type: String,
@@ -121,14 +128,25 @@ teamSchema.statics.createOneTeam = async function (teamData) {
     // Create team
     const team = await this.create(teamData);
 
-    await team.populate("author", {
+    //TODO: this must be replaced once the frontend url is known
+    const qrCodeData = `${process.env.FRONTEND_BASE_URL}/teams/${team._id}`;
+    const qrCodeUrl = await generateQRCode(qrCodeData);
+
+    //update team with qr code url
+    const updatedTeam = await this.findByIdAndUpdate(
+      team._id,
+      { qrCode: qrCodeUrl },
+      { new: true }
+    );
+
+    await updatedTeam.populate("author", {
       fullName: 1,
       profileImage: 1,
       _id: 0,
     });
 
     // Return team
-    return team;
+    return updatedTeam;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }

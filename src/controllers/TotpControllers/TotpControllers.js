@@ -1,9 +1,7 @@
 const {
   generateOTP,
   validateToken,
-  createSecretObj,
-  generateTOTP,
-} = require("../../services/2fa/HandleOTPAuth");
+} = require("../../services/totp/HandleOTPAuth");
 
 const generateTOTPAndQRCode = async (req, res) => {
   try {
