@@ -13,3 +13,4 @@ const { kickstartServer } = require("../config/server");
 
 // Start the server
 kickstartServer();
+

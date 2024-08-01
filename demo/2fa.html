@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TOTP Demo</title>
+  </head>
+  <body>
+    <h1>TOTP (Two-Factor Authentication) Demo</h1>
+
+    <section id="generate-totp-section">
+      <h2>Generate TOTP and QR Code</h2>
+      <button id="generate-totp-btn">Generate TOTP</button>
+      <div id="qr-code"></div>
+      <p id="secret"></p>
+    </section>
+
+    <section id="verify-totp-section">
+      <h2>Verify TOTP Token</h2>
+      <form id="verify-totp-form">
+        <label for="token">Enter TOTP Token:</label>
+        <input type="text" id="token" name="token" required />
+        <input type="hidden" id="hidden-secret" name="secret" />
+        <button type="submit">Verify Token</button>
+      </form>
+      <p id="verification-result"></p>
+
+      <h1>Your QR Code</h1>
+      <img
+        src="data:image/png;base64,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"
+        alt=""
+      />
+    </section>
+
+    <script>
+      const backendUrl = "http://localhost:5000"; // Update this with your backend URL
+
+      document
+        .getElementById("generate-totp-btn")
+        .addEventListener("click", () => {
+          fetch(`${backendUrl}/2fa/generate`, {
+            method: "GET",
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById(
+                "qr-code"
+              ).innerHTML = `<img src="${data.qrCode}" alt="QR Code">`;
+              document.getElementById(
+                "secret"
+              ).innerText = `Secret: ${data.secret}`;
+              document.getElementById("hidden-secret").value = data.secret;
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+
+      document
+        .getElementById("verify-totp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+
+          // Create a FormData object to handle multipart form data
+          const formData = new FormData();
+          formData.append(
+            "data",
+            JSON.stringify({
+              token: document.getElementById("token").value,
+              secret: document.getElementById("hidden-secret").value,
+            })
+          );
+
+          fetch(`${backendUrl}/2fa/verify`, {
+            method: "POST",
+            body: formData, // Send as multipart/form-data
+          })
+            .then((response) => response.text())
+            .then((result) => {
+              document.getElementById("verification-result").innerText = result;
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+    </script>
+  </body>
+</html>

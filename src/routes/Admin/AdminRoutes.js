@@ -8,6 +8,9 @@ const {
   getOneAdmin,
   getAllAdmins,
   loginAdmin,
+  verify2FA,
+  initiate2FASetup,
+  verify2FASetup,
   registerAdmin,
   updateAdminById,
   sendPasswordResetOTP,
@@ -22,6 +25,9 @@ AdminRouter.get("/find/:id", authorizeAdmin, getOneAdmin);
 AdminRouter.get("/all", authorizeAdmin, getAllAdmins);
 AdminRouter.post("/register", registerAdmin);
 AdminRouter.post("/login", loginRateLimiter, loginAdmin);
+AdminRouter.post("/2fa", verify2FA);
+AdminRouter.post("/2fa/setup/:id", initiate2FASetup);
+AdminRouter.post("/2fa/verify", verify2FASetup);
 AdminRouter.post("/send-otp", sendPasswordResetOTP);
 AdminRouter.post("/validate-otp", validatePasswordResetOTP);
 AdminRouter.patch("/reset", updateAdminPasswordByOTP);
