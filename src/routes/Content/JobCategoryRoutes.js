@@ -1,4 +1,4 @@
-const JobRouter = require("express").Router();
+const JobCategoryRouter = require("express").Router();
 
 const {
   getAllCategories,
@@ -9,10 +9,10 @@ const {
 } = require("../../controllers/Content/Job/JobCategoryController");
 const { authorizeAdmin } = require("../../middlewares");
 
-JobRouter.get("/all", getAllCategories);
-JobRouter.get("/find/:id", getOneCategory);
-JobRouter.post("/create", authorizeAdmin, createOneCategory);
-JobRouter.patch("/update/:id", authorizeAdmin, updateOneCategory);
-JobRouter.delete("/delete/:id", authorizeAdmin, deleteOneCategory);
+JobCategoryRouter.get("/all", getAllCategories);
+JobCategoryRouter.get("/find/:id", getOneCategory);
+JobCategoryRouter.post("/create", authorizeAdmin, createOneCategory);
+JobCategoryRouter.patch("/update/:id", authorizeAdmin, updateOneCategory);
+JobCategoryRouter.delete("/delete/:id", authorizeAdmin, deleteOneCategory);
 
-module.exports = JobRouter;
+module.exports = JobCategoryRouter;

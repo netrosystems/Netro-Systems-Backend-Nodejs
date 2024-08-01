@@ -78,7 +78,10 @@ const teamSchema = new mongoose.Schema({
 
 // Middleware to update `updatedAt` on every save
 teamSchema.pre("save", function (next) {
-  this.updatedAt = () => Timekoto();
+  if (this.isModified()) {
+    // Check if any field is modified
+    this.updatedAt = Timekoto(); // Set updatedAt to current time
+  }
   next();
 });
 
@@ -132,21 +135,18 @@ teamSchema.statics.createOneTeam = async function (teamData) {
     const qrCodeData = `${process.env.FRONTEND_BASE_URL}/teams/${team._id}`;
     const qrCodeUrl = await generateQRCode(qrCodeData);
 
-    //update team with qr code url
-    const updatedTeam = await this.findByIdAndUpdate(
-      team._id,
-      { qrCode: qrCodeUrl },
-      { new: true }
-    );
+    // Update team with qr code url
+    team.qrCode = qrCodeUrl;
+    await team.save(); // Save the updated team document
 
-    await updatedTeam.populate("author", {
+    await team.populate("author", {
       fullName: 1,
       profileImage: 1,
       _id: 0,
     });
 
     // Return team
-    return updatedTeam;
+    return team;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -155,16 +155,20 @@ teamSchema.statics.createOneTeam = async function (teamData) {
 // Define a static method to update a team by id
 teamSchema.statics.updateOneTeam = async function ({ teamId, updatedData }) {
   try {
-    // Find team by id and update
-    const team = await this.findByIdAndUpdate(teamId, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    // Find team by id
+    const team = await this.findById(teamId);
 
     if (!team) {
       throw new CustomError(404, "Team not found");
     }
 
+    // Update the fields of the team document
+    Object.assign(team, updatedData);
+
+    // Save the updated team document
+    await team.save();
+
+    // Populate the author field
     await team.populate("author", {
       fullName: 1,
       profileImage: 1,

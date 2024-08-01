@@ -65,6 +65,16 @@ const adminSchema = new mongoose.Schema({
     type: Number,
     default: () => Timekoto(),
   },
+  updatedAt: {
+    type: Number,
+    default: () => Timekoto(),
+  },
+});
+
+// Middleware to update `updatedAt` on every save
+adminSchema.pre("save", function (next) {
+  this.updatedAt = () => Timekoto();
+  next();
 });
 
 //get all admins
