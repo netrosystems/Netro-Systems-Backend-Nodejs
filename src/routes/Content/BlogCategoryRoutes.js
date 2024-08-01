@@ -1,4 +1,4 @@
-const BlogRouter = require("express").Router();
+const BlogCategoryRouter = require("express").Router();
 
 const {
   getAllCategories,
@@ -9,10 +9,10 @@ const {
 } = require("../../controllers/Content/Blog/BlogCategoryController");
 const { authorizeAdmin } = require("../../middlewares");
 
-BlogRouter.get("/all", getAllCategories);
-BlogRouter.get("/find/:id", getOneCategory);
-BlogRouter.post("/create", authorizeAdmin, createOneCategory);
-BlogRouter.patch("/update/:id", authorizeAdmin, updateOneCategory);
-BlogRouter.delete("/delete/:id", authorizeAdmin, deleteOneCategory);
+BlogCategoryRouter.get("/all", getAllCategories);
+BlogCategoryRouter.get("/find/:id", getOneCategory);
+BlogCategoryRouter.post("/create", authorizeAdmin, createOneCategory);
+BlogCategoryRouter.patch("/update/:id", authorizeAdmin, updateOneCategory);
+BlogCategoryRouter.delete("/delete/:id", authorizeAdmin, deleteOneCategory);
 
-module.exports = BlogRouter;
+module.exports = BlogCategoryRouter;

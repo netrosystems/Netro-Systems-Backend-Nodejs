@@ -1,4 +1,4 @@
-const PortfolioRouter = require("express").Router();
+const PortfolioCategoryRouter = require("express").Router();
 
 const {
   getAllCategories,
@@ -9,10 +9,14 @@ const {
 } = require("../../controllers/Content/Portfolio/PortfolioCategoryController");
 const { authorizeAdmin } = require("../../middlewares");
 
-PortfolioRouter.get("/all", getAllCategories);
-PortfolioRouter.get("/find/:id", getOneCategory);
-PortfolioRouter.post("/create", authorizeAdmin, createOneCategory);
-PortfolioRouter.patch("/update/:id", authorizeAdmin, updateOneCategory);
-PortfolioRouter.delete("/delete/:id", authorizeAdmin, deleteOneCategory);
+PortfolioCategoryRouter.get("/all", getAllCategories);
+PortfolioCategoryRouter.get("/find/:id", getOneCategory);
+PortfolioCategoryRouter.post("/create", authorizeAdmin, createOneCategory);
+PortfolioCategoryRouter.patch("/update/:id", authorizeAdmin, updateOneCategory);
+PortfolioCategoryRouter.delete(
+  "/delete/:id",
+  authorizeAdmin,
+  deleteOneCategory
+);
 
-module.exports = PortfolioRouter;
+module.exports = PortfolioCategoryRouter;
