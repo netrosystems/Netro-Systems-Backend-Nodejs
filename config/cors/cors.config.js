@@ -6,9 +6,10 @@ const { logger, CustomError } = require("../../src/services");
 const allowedOrigins = [
   //for development
   "http://localhost:3000",
-
   //ip address
   "http://127.0.0.1:3000",
+  "http://127.0.0.1:5500",
+  "null",
 
   //for deployment
 ];

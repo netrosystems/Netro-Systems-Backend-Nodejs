@@ -14,16 +14,43 @@ const {
 
 // Login Admin using mongoose
 const loginAdmin = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { email, password } = data;
   const result = await Admin.login({ email, password });
   logger.log("info", `Admin logged in: ${email}`);
   return sendResponse(res, 200, "Admin logged in successfully", result);
 };
 
+// Verify 2FA using mongoose
+const verify2FA = async (req, res) => {
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
+  const { tempSession, token } = data;
+  const result = await Admin.verify2FA({ tempSession, token });
+  logger.log("info", `2FA verified successfully`);
+  return sendResponse(res, 200, "2FA verified successfully", result);
+};
+
+// initiate2FASetup
+const initiate2FASetup = async (req, res) => {
+  const adminId = req?.params?.id;
+  const result = await Admin.initiate2FASetup({ adminId });
+  logger.log("info", `2FA setup initiated successfully`);
+  return sendResponse(res, 200, "2FA setup initiated successfully", result);
+};
+
+// verify2FASetup
+const verify2FASetup = async (req, res) => {
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
+  const { adminId, token } = data;
+  const result = await Admin.verify2FASetup({ adminId, token });
+  logger.log("info", `2FA setup verified successfully`);
+  return sendResponse(res, 200, "2FA setup verified successfully", result);
+};
+
 // Register Admin using mongoose
 const registerAdmin = async (req, res) => {
-  const { fullName, email, password } = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
+  const { fullName, email, password } = data;
   if (!fullName || !email || !password) {
     return sendResponse(res, 400, "Missing required fields");
   }
@@ -94,7 +121,7 @@ const updateAdminById = async (req, res) => {
 
 // Send password reset OTP
 const sendPasswordResetOTP = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { email } = data;
   //check if email exists
   const admin = await Admin.findOne({ email });
@@ -112,7 +139,7 @@ const sendPasswordResetOTP = async (req, res) => {
 };
 
 const validatePasswordResetOTP = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { otp, email } = data;
   if (!otp || !email) {
     return sendResponse(res, 400, "All fields are required");
@@ -134,7 +161,7 @@ const validatePasswordResetOTP = async (req, res) => {
 
 // Update admin password by OTP
 const updateAdminPasswordByOTP = async (req, res) => {
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { otp, email, newPassword } = data;
 
   const updatedAdmin = await Admin.updatePasswordByOTP({
@@ -152,7 +179,7 @@ const updateAdminPasswordByOTP = async (req, res) => {
 // Update admin password by old password
 const updateAdminPasswordByOldPassword = async (req, res) => {
   const email = req?.params?.email;
-  const data = JSON.parse(req?.body?.data);
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const { oldPassword, newPassword } = data;
 
   const updatedAdmin = await Admin.updatePasswordByEmail({
@@ -191,6 +218,9 @@ module.exports = {
   validatePasswordResetOTP: asyncHandler(validatePasswordResetOTP),
   updateAdminPasswordByOTP: asyncHandler(updateAdminPasswordByOTP),
   loginAdmin: asyncHandler(loginAdmin),
+  verify2FA: asyncHandler(verify2FA),
+  initiate2FASetup: asyncHandler(initiate2FASetup),
+  verify2FASetup: asyncHandler(verify2FASetup),
   registerAdmin: asyncHandler(registerAdmin),
   updateAdminPasswordByOldPassword: asyncHandler(
     updateAdminPasswordByOldPassword

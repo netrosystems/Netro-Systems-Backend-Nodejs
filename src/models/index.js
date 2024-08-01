@@ -8,6 +8,10 @@ const Blog = require("./Content/Blog/BlogModel");
 const BlogCategory = require("./Content/Blog/BlogCategoryModel");
 const Service = require("./Content/Service/ServiceModel");
 const Portfolio = require("./Content/Portfolio/PortfolioModel");
+const PortfolioCategory = require("./Content/Portfolio/PortfolioCategoryModel");
+const Team = require("./Content/Team/TeamModel");
+const Job = require("./Content/Job/JobModel");
+const JobCategory = require("./Content/Job/JobCategoryModel");
 
 module.exports = {
   Admin,
@@ -18,4 +22,8 @@ module.exports = {
   BlogCategory,
   Service,
   Portfolio,
+  PortfolioCategory,
+  Team,
+  Job,
+  JobCategory,
 };
