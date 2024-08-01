@@ -52,7 +52,7 @@ const validateToken = (secret, token) => {
     secret: secret, // Use the secret directly
   });
 
-  const validation = totp.validate({ token, window: 2 });
+  const validation = totp.validate({ token, window: 0 });
   console.log("Validation result:", validation);
 
   return validation !== null; // Returns true if valid, false otherwise

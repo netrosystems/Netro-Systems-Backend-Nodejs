@@ -21,6 +21,32 @@ const loginAdmin = async (req, res) => {
   return sendResponse(res, 200, "Admin logged in successfully", result);
 };
 
+// Verify 2FA using mongoose
+const verify2FA = async (req, res) => {
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
+  const { tempSession, token } = data;
+  const result = await Admin.verify2FA({ tempSession, token });
+  logger.log("info", `2FA verified successfully`);
+  return sendResponse(res, 200, "2FA verified successfully", result);
+};
+
+// initiate2FASetup
+const initiate2FASetup = async (req, res) => {
+  const adminId = req?.params?.id;
+  const result = await Admin.initiate2FASetup({ adminId });
+  logger.log("info", `2FA setup initiated successfully`);
+  return sendResponse(res, 200, "2FA setup initiated successfully", result);
+};
+
+// verify2FASetup
+const verify2FASetup = async (req, res) => {
+  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
+  const { adminId, token } = data;
+  const result = await Admin.verify2FASetup({ adminId, token });
+  logger.log("info", `2FA setup verified successfully`);
+  return sendResponse(res, 200, "2FA setup verified successfully", result);
+};
+
 // Register Admin using mongoose
 const registerAdmin = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
@@ -192,6 +218,9 @@ module.exports = {
   validatePasswordResetOTP: asyncHandler(validatePasswordResetOTP),
   updateAdminPasswordByOTP: asyncHandler(updateAdminPasswordByOTP),
   loginAdmin: asyncHandler(loginAdmin),
+  verify2FA: asyncHandler(verify2FA),
+  initiate2FASetup: asyncHandler(initiate2FASetup),
+  verify2FASetup: asyncHandler(verify2FASetup),
   registerAdmin: asyncHandler(registerAdmin),
   updateAdminPasswordByOldPassword: asyncHandler(
     updateAdminPasswordByOldPassword

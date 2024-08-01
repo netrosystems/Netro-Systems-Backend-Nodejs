@@ -10,6 +10,7 @@ const Service = require("./Content/Service/ServiceModel");
 const Portfolio = require("./Content/Portfolio/PortfolioModel");
 const PortfolioCategory = require("./Content/Portfolio/PortfolioCategoryModel");
 const Team = require("./Content/Team/TeamModel");
+const Job = require("./Content/Job/JobModel");
 
 module.exports = {
   Admin,
@@ -22,4 +23,5 @@ module.exports = {
   Portfolio,
   PortfolioCategory,
   Team,
+  Job,
 };

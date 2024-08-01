@@ -14,10 +14,6 @@ const generateTOTPAndQRCode = async (req, res) => {
     // Generate OTP with secret, TOTP object, and QR code
     const { secret, qrCode, totp } = await generateOTP(issuer, label);
 
-    console.log("Generated Secret (Base32):", secret);
-    console.log("Generated TOTP URI:", totp.toString());
-    console.log("Generated QR Code (Base64):", qrCode);
-
     return res.json({
       secret, // Provides the secret in Base32 format
       uri: totp.toString(), // URI for the TOTP
