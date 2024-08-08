@@ -51,7 +51,7 @@ const resumeSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  resumeUrl: {
+  liveUrl: {
     type: String,
     required: true,
     trim: true,
