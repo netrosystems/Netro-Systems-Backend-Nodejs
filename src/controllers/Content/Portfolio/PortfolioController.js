@@ -43,6 +43,7 @@ const createOnePortfolio = async (req, res) => {
     category,
     type,
     liveUrl,
+    projectImages,
     userGained,
     investment,
     expansion,
@@ -60,6 +61,7 @@ const createOnePortfolio = async (req, res) => {
     !category ||
     !type ||
     !liveUrl ||
+    !projectImages ||
     !userGained ||
     !investment ||
     !expansion ||
@@ -69,7 +71,7 @@ const createOnePortfolio = async (req, res) => {
   ) {
     throw new CustomError(
       400,
-      "These fields are required: title, category, content, metaTags, metaDescription, tags"
+      "These fields are required: title, videoUrl, clientOrigin, timeline, content, category, type, liveUrl,projectImages, userGained, investment, expansion, salesIncreased, metaTags, metaDescription"
     );
   }
 
@@ -89,6 +91,7 @@ const createOnePortfolio = async (req, res) => {
     category,
     type,
     liveUrl,
+    projectImages,
     userGained,
     investment,
     expansion,
@@ -110,15 +113,15 @@ const createOnePortfolio = async (req, res) => {
   }
 
   //upload projectImages
-  if (files?.multiple) {
-    const fileUrls = await handleFileUpload({
-      req,
-      files: files?.multiple,
-      folderName,
-    });
-    const projectImages = fileUrls;
-    updatedData = { ...updatedData, projectImages };
-  }
+  // if (files?.multiple) {
+  //   const fileUrls = await handleFileUpload({
+  //     req,
+  //     files: files?.multiple,
+  //     folderName,
+  //   });
+  //   const projectImages = fileUrls;
+  //   updatedData = { ...updatedData, projectImages };
+  // }
 
   //perform query on database
   const portfolio = await Portfolio.createOnePortfolio(updatedData);
@@ -151,15 +154,15 @@ const updateOnePortfolio = async (req, res) => {
   }
 
   //upload projectImages
-  if (files?.multiple) {
-    const fileUrls = await handleFileUpload({
-      req,
-      files: files?.multiple,
-      folderName,
-    });
-    const projectImages = fileUrls;
-    updatedData = { ...updatedData, projectImages };
-  }
+  // if (files?.multiple) {
+  //   const fileUrls = await handleFileUpload({
+  //     req,
+  //     files: files?.multiple,
+  //     folderName,
+  //   });
+  //   const projectImages = fileUrls;
+  //   updatedData = { ...updatedData, projectImages };
+  // }
 
   //perform query on database
   const updatedPortfolio = await Portfolio.updateOnePortfolio({
