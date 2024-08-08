@@ -112,6 +112,20 @@ const updateOneJob = async (req, res) => {
   return sendResponse(res, 200, "Job updated successfully", updatedJob);
 };
 
+//toggle job status using mongoose
+const toggleJobStatus = async (req, res) => {
+  const jobId = req?.params?.id;
+
+  //object id validation
+  if (!ObjectIdChecker(jobId)) {
+    return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  //perform query on database
+  const updatedJob = await Job.toggleJobStatus(jobId);
+  return sendResponse(res, 200, "Job status updated successfully", updatedJob);
+};
+
 //delete a Job using mongoose
 const deleteOneJob = async (req, res) => {
   const jobId = req?.params?.id;
@@ -131,5 +145,6 @@ module.exports = {
   getOneJob: asyncHandler(getOneJob),
   createOneJob: asyncHandler(createOneJob),
   updateOneJob: asyncHandler(updateOneJob),
+  toggleJobStatus: asyncHandler(toggleJobStatus),
   deleteOneJob: asyncHandler(deleteOneJob),
 };

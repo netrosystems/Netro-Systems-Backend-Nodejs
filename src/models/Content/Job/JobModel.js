@@ -178,6 +178,39 @@ jobSchema.statics.updateOneJob = async function ({ jobId, updatedData }) {
   }
 };
 
+// Define a static method to toggle status of a job by id
+jobSchema.statics.toggleJobStatus = async function (jobId) {
+  try {
+    // Find job by id
+    const job = await this.findById(jobId);
+
+    if (!job) {
+      throw new CustomError(404, "Job not found");
+    }
+
+    // Toggle status of job
+    const status = job.status === "active" ? "inactive" : "active";
+
+    // Update status of job
+    const updatedJob = await this.findByIdAndUpdate(
+      jobId,
+      { status },
+      { new: true }
+    );
+
+    await updatedJob.populate("author", {
+      fullName: 1,
+      profileImage: 1,
+      _id: 0,
+    });
+
+    // Return job
+    return updatedJob;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 // Define a static method to delete a job by id
 jobSchema.statics.deleteOneJob = async function (jobId) {
   try {

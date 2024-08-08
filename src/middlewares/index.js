@@ -2,17 +2,17 @@
 
 const { asyncHandler } = require("./AsyncHandler");
 const {
-  authorizeRequest,
+  // authorizeRequest,
   authorizeAdmin,
-  isUserAccessingOwnData,
+  // isUserAccessingOwnData,
 } = require("./AuthorizeRequest");
 const { loginRateLimiter, registerRateLimiter } = require("./RateLimiters");
 
 module.exports = {
   asyncHandler,
-  authorizeRequest,
+  // authorizeRequest,
   authorizeAdmin,
-  isUserAccessingOwnData,
+  // isUserAccessingOwnData,
   loginRateLimiter,
   registerRateLimiter,
 };
