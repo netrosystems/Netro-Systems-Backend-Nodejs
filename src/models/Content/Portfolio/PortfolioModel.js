@@ -67,7 +67,12 @@ const portfolioSchema = new mongoose.Schema({
   },
   featuredImage: {
     type: String,
+    default: "https://via.placeholder.com/150",
     required: true,
+  },
+  metaTitle: {
+    type: String,
+    default: "",
   },
   metaTags: {
     type: [String],
@@ -76,7 +81,7 @@ const portfolioSchema = new mongoose.Schema({
   },
   metaDescription: {
     type: String,
-    required: true,
+    default: "",
   },
   published: {
     type: Boolean,

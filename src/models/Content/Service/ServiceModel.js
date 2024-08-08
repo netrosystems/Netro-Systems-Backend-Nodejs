@@ -29,6 +29,10 @@ const serviceSchema = new mongoose.Schema({
     default: "https://via.placeholder.com/150",
     required: true,
   },
+  metaTitle: {
+    type: String,
+    default: "",
+  },
   metaTags: {
     type: [String],
     default: [],
@@ -36,7 +40,7 @@ const serviceSchema = new mongoose.Schema({
   },
   metaDescription: {
     type: String,
-    required: true,
+    default: "",
   },
   tags: {
     type: [String],

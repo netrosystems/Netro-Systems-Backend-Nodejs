@@ -35,89 +35,56 @@ const createOneResume = async (req, res) => {
   const files = req?.files;
 
   const {
-    title,
-    videoUrl,
-    clientOrigin,
-    timeline,
-    content,
-    category,
-    type,
+    job,
+    name,
+    email,
+    number,
+    location,
+    salaryExpectation,
+    experience,
+    previousCompany,
     liveUrl,
-    userGained,
-    investment,
-    expansion,
-    salesIncreased,
-    metaTags,
-    metaDescription,
   } = data;
 
   if (
-    !title ||
-    !videoUrl ||
-    !clientOrigin ||
-    !timeline ||
-    !content ||
-    !category ||
-    !type ||
-    !liveUrl ||
-    !userGained ||
-    !investment ||
-    !expansion ||
-    !salesIncreased ||
-    !metaTags ||
-    !metaDescription
+    !job ||
+    !name ||
+    !email ||
+    !number ||
+    !location ||
+    !salaryExpectation ||
+    !experience ||
+    !previousCompany ||
+    !liveUrl
   ) {
     throw new CustomError(
       400,
-      "These fields are required: title, category, content, metaTags, metaDescription, tags"
+      "These fields are required: job, name, email, number, location, salaryExpectation, experience, previousCompany, liveUrl"
     );
   }
 
-  //validate authority from middleware authentication
-  const userId = req?.auth?._id;
-  if (!userId) {
-    throw new CustomError(401, "Unauthorized user");
-  }
-
   let updatedData = {
-    author: userId,
-    title,
-    videoUrl,
-    clientOrigin,
-    timeline,
-    content,
-    category,
-    type,
+    job,
+    name,
+    email,
+    number,
+    location,
+    salaryExpectation,
+    experience,
+    previousCompany,
     liveUrl,
-    userGained,
-    investment,
-    expansion,
-    salesIncreased,
-    metaTags,
-    metaDescription,
   };
   const folderName = "resumes";
 
-  //upload featuredImage
+  //upload resumeUrl
   if (files?.single) {
     const fileUrls = await handleFileUpload({
       req,
       files: files?.single,
       folderName,
     });
-    const featuredImage = fileUrls[0];
-    updatedData = { ...updatedData, featuredImage };
-  }
-
-  //upload projectImages
-  if (files?.multiple) {
-    const fileUrls = await handleFileUpload({
-      req,
-      files: files?.multiple,
-      folderName,
-    });
-    const projectImages = fileUrls;
-    updatedData = { ...updatedData, projectImages };
+    const resumeUrl = fileUrls[0];
+    updatedData = { ...updatedData, resumeUrl };
   }
 
   //perform query on database
@@ -139,26 +106,15 @@ const updateOneResume = async (req, res) => {
   let updatedData = data ? data : {};
   const folderName = "resumes";
 
-  //upload featuredImage
+  //upload resumeUrl
   if (files?.single) {
     const fileUrls = await handleFileUpload({
       req,
       files: files?.single,
       folderName,
     });
-    const featuredImage = fileUrls[0];
-    updatedData = { ...updatedData, featuredImage };
-  }
-
-  //upload projectImages
-  if (files?.multiple) {
-    const fileUrls = await handleFileUpload({
-      req,
-      files: files?.multiple,
-      folderName,
-    });
-    const projectImages = fileUrls;
-    updatedData = { ...updatedData, projectImages };
+    const resumeUrl = fileUrls[0];
+    updatedData = { ...updatedData, resumeUrl };
   }
 
   //perform query on database
