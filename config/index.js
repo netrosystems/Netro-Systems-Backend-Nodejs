@@ -1,18 +1,15 @@
 // config/index.js
 
-const {
-  allowedOrigins,
-  initializeCors,
-} = require("../config/cors/cors.config");
-const { connectToDatabase } = require("../config/databases/mongoose.config");
-const { nodemailerTransporter } = require("../config/emails/nodemailer.config");
-const { initializeHelmet } = require("../config/helmet/helmet.config");
+const { allowedOrigins, initializeCors } = require("./cors/cors.config");
+const { connectToDatabase } = require("./databases/mongoose.config");
+const { initializeHelmet } = require("./helmet/helmet.config");
 const {
   initializeMonitoring,
   getMetrics,
-} = require("../config/monitorings/prometheus.config");
-const { initializeMulter } = require("../config/multer/multer.config");
-const { initializeEnv } = require("../config/env/env.config");
+} = require("./monitorings/prometheus.config");
+const { initializeMulter } = require("./multer/multer.config");
+const { nodemailerTransporter } = require("./emails/nodemailer.config");
+const { loadEnv } = require("./env/env.config");
 
 module.exports = {
   allowedOrigins,
@@ -23,5 +20,5 @@ module.exports = {
   initializeMonitoring,
   getMetrics,
   initializeMulter,
-  initializeEnv,
+  loadEnv,
 };
