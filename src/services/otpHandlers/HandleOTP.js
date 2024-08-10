@@ -46,6 +46,7 @@ const sendOTP = async ({ email }) => {
     const code = otp;
     //send the email
     const status = await sendPasswordResetOTPEmail({ email, code });
+    console.log("status", status);
     if (!status?.code === 200) {
       return { error: `${email} doesn't exist` };
     }

@@ -1,5 +1,8 @@
 const fs = require("fs");
 const path = require("path");
+const {
+  nodemailerTransporter,
+} = require("../../../config/emails/nodemailer.config");
 
 const sendPasswordResetOTPEmail = async ({ email, code }) => {
   try {
@@ -43,6 +46,7 @@ const sendEmail = async (receiver, subject, code) => {
       subject: subject,
       html: formattedEmail,
     });
+    console.log("Message sent: %s", info?.messageId);
     return info?.messageId;
   } catch (error) {
     return error?.message;
