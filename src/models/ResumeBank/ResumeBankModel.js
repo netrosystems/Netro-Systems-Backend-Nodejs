@@ -83,9 +83,7 @@ resumeSchema.pre("save", function (next) {
 resumeSchema.statics.getAllResumes = async function () {
   try {
     // Find all resumes and populate the resumeedBy field while excluding the password field
-    const resumes = await this.find()
-      .sort({ createdAt: -1 })
-      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+    const resumes = await this.find().sort({ createdAt: -1 });
 
     if (resumes?.length === 0) {
       throw new CustomError(404, "No resumes found");
@@ -102,11 +100,7 @@ resumeSchema.statics.getAllResumes = async function () {
 resumeSchema.statics.getOneResume = async function (resumeId) {
   try {
     // Find resume by id and populate the resumeedBy field while excluding the password field
-    const resume = await this.findById(resumeId).populate("author", {
-      fullName: 1,
-      profileImage: 1,
-      _id: 0,
-    });
+    const resume = await this.findById(resumeId);
 
     if (!resume) {
       throw new CustomError(404, "Resume not found");
@@ -124,12 +118,6 @@ resumeSchema.statics.createOneResume = async function (resumeData) {
   try {
     // Create resume
     const resume = await this.create(resumeData);
-
-    await resume.populate("author", {
-      fullName: 1,
-      profileImage: 1,
-      _id: 0,
-    });
 
     // Return resume
     return resume;
@@ -153,12 +141,6 @@ resumeSchema.statics.updateOneResume = async function ({
     if (!resume) {
       throw new CustomError(404, "Resume not found");
     }
-
-    await resume.populate("author", {
-      fullName: 1,
-      profileImage: 1,
-      _id: 0,
-    });
 
     // Return resume
     return resume;
