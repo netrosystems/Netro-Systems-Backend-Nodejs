@@ -11,6 +11,7 @@ const Team = require("./Content/Team/TeamModel");
 const Job = require("./Content/Job/JobModel");
 const JobCategory = require("./Content/Job/JobCategoryModel");
 const Resume = require("./ResumeBank/ResumeBankModel");
+const Testimonial = require("./Testimonial/TestimonialModel");
 
 module.exports = {
   Admin,
@@ -24,4 +25,5 @@ module.exports = {
   Job,
   JobCategory,
   Resume,
+  Testimonial,
 };
