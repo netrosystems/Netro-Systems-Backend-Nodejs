@@ -29,6 +29,34 @@ const getOnePortfolio = async (req, res) => {
   return sendResponse(res, 200, "Portfolio retrieved successfully", portfolio);
 };
 
+//get related portfolios using mongoose
+const getRelatedPortfoliosByCategory = async (req, res) => {
+  const portfolioCategory = req?.params?.category;
+
+  //perform query on database
+  const portfolios = await Portfolio.getRelatedPortfoliosByCategory(
+    portfolioCategory
+  );
+  return sendResponse(
+    res,
+    200,
+    "Related portfolios retrieved successfully",
+    portfolios
+  );
+};
+
+// //get featured portfolios using mongoose
+// const getFeaturedPortfolios = async (req, res) => {
+//   //perform query on database
+//   const portfolios = await Portfolio.getFeaturedPortfolios();
+//   return sendResponse(
+//     res,
+//     200,
+//     "Featured portfolios retrieved successfully",
+//     portfolios
+//   );
+// };
+
 // Create a new Portfolio
 const createOnePortfolio = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
@@ -199,6 +227,7 @@ const deleteOnePortfolio = async (req, res) => {
 module.exports = {
   getAllPortfolios: asyncHandler(getAllPortfolios),
   getOnePortfolio: asyncHandler(getOnePortfolio),
+  getRelatedPortfoliosByCategory: asyncHandler(getRelatedPortfoliosByCategory),
   createOnePortfolio: asyncHandler(createOnePortfolio),
   updateOnePortfolio: asyncHandler(updateOnePortfolio),
   deleteOnePortfolio: asyncHandler(deleteOnePortfolio),
