@@ -29,6 +29,28 @@ const getOneBlog = async (req, res) => {
   return sendResponse(res, 200, "Blog retrieved successfully", blog);
 };
 
+//get 3 most recent Blog using mongoose
+const getMostRecentBlogs = async (req, res) => {
+  //perform query on database
+  const blogs = await Blog.getMostRecentBlogs();
+  return sendResponse(res, 200, "Fetched most recent blogs", blogs);
+};
+
+//get blogs by category using mongoose
+const getBlogsByCategory = async (req, res) => {
+  const category = req?.params?.category;
+  //perform query on database
+  const blogs = await Blog.getBlogsByCategory(category);
+  return sendResponse(res, 200, "Fetched blogs by category", blogs);
+};
+
+//get featured Blog using mongoose
+const getFeaturedBlogs = async (req, res) => {
+  //perform query on database
+  const blogs = await Blog.getFeaturedBlogs();
+  return sendResponse(res, 200, "Fetched featured blogs", blogs);
+};
+
 // Create a new Blog
 const createOneBlog = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
@@ -109,6 +131,20 @@ const updateOneBlog = async (req, res) => {
   return sendResponse(res, 200, "Blog updated successfully", updatedBlog);
 };
 
+//toggle featured status of a Blog using mongoose
+const toggleFeaturedStatus = async (req, res) => {
+  const blogId = req?.params?.id;
+
+  //object id validation
+  if (!ObjectIdChecker(blogId)) {
+    return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  //perform query on database
+  const blog = await Blog.toggleFeaturedStatus(blogId);
+  return sendResponse(res, 200, "Blog updated successfully", blog);
+};
+
 //delete a Blog using mongoose
 const deleteOneBlog = async (req, res) => {
   const blogId = req?.params?.id;
@@ -126,7 +162,11 @@ const deleteOneBlog = async (req, res) => {
 module.exports = {
   getAllBlogs: asyncHandler(getAllBlogs),
   getOneBlog: asyncHandler(getOneBlog),
+  getMostRecentBlogs: asyncHandler(getMostRecentBlogs),
+  getBlogsByCategory: asyncHandler(getBlogsByCategory),
+  getFeaturedBlogs: asyncHandler(getFeaturedBlogs),
   createOneBlog: asyncHandler(createOneBlog),
   updateOneBlog: asyncHandler(updateOneBlog),
+  toggleFeaturedStatus: asyncHandler(toggleFeaturedStatus),
   deleteOneBlog: asyncHandler(deleteOneBlog),
 };

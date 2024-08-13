@@ -151,6 +151,27 @@ portfolioSchema.statics.getOnePortfolio = async function (portfolioId) {
   }
 };
 
+// Define  a static method to get related portfolios by category
+portfolioSchema.statics.getRelatedPortfoliosByCategory = async function (
+  portfolioCategory
+) {
+  try {
+    // Find related portfolios by category and populate the portfolioedBy field while excluding the password field
+    const portfolios = await this.find({ category: portfolioCategory })
+      .sort({ createdAt: -1 })
+      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (portfolios?.length === 0) {
+      throw new CustomError(404, "No portfolios found");
+    }
+
+    // Return portfolios
+    return portfolios;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 // Define a static method to create a portfolio
 portfolioSchema.statics.createOnePortfolio = async function (portfolioData) {
   try {
