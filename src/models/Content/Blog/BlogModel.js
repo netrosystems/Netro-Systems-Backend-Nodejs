@@ -29,6 +29,10 @@ const blogSchema = new mongoose.Schema({
     default: "https://via.placeholder.com/150",
     required: true,
   },
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
   metaTitle: {
     type: String,
     default: "",
@@ -115,6 +119,64 @@ blogSchema.statics.getOneBlog = async function (blogId) {
   }
 };
 
+// Define a static method to get 3 most recent blogs
+blogSchema.statics.getMostRecentBlogs = async function () {
+  try {
+    // Find all blogs and populate the blogedBy field while excluding the password field
+    const blogs = await this.find()
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No blogs found");
+    }
+
+    // Return blogs
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+// Define a static method to get blogs by category
+blogSchema.statics.getBlogsByCategory = async function (blogCategory) {
+  try {
+    // Find blogs by category and populate the blogedBy field while excluding the password field
+    const blogs = await this.find({ category: blogCategory })
+      .sort({ createdAt: -1 })
+      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No blogs found");
+    }
+
+    // Return blogs
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+// Define a static method to get featured blogs
+blogSchema.statics.getFeaturedBlogs = async function () {
+  try {
+    // Find featured blogs and populate the blogedBy field while excluding the password field
+    const blogs = await this.find({ isFeatured: true })
+      .sort({ createdAt: -1 })
+      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No featured blogs found");
+    }
+
+    // Return blogs
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 // Define a static method to create a blog
 blogSchema.statics.createOneBlog = async function (blogData) {
   try {
@@ -152,6 +214,27 @@ blogSchema.statics.updateOneBlog = async function ({ blogId, updatedData }) {
       profileImage: 1,
       _id: 0,
     });
+
+    // Return blog
+    return blog;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+// Define a static method to toggle featured status of a blog by id
+blogSchema.statics.toggleFeaturedStatus = async function (blogId) {
+  try {
+    // Find blog by id and update
+    const blog = await this.findByIdAndUpdate(
+      blogId,
+      { isFeatured: true },
+      { new: true, runValidators: true }
+    );
+
+    if (!blog) {
+      throw new CustomError(404, "Blog not found");
+    }
 
     // Return blog
     return blog;
