@@ -12,6 +12,8 @@ const allowedOrigins = [
   "null",
 
   //for deployment
+  "https://netrosystems.netlify.com",
+  "https://netrosystems.vercel.app",
 ];
 
 const corsOptions = {
