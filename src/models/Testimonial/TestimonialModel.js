@@ -54,12 +54,15 @@ testimonialSchema.statics.getAllTestimonials = async function () {
   try {
     // Find all testimonials and populate the testimonialedBy field while excluding the password field
     const testimonials = await this.find()
-      .sort({ createdAt: -1 })
+      // .sort({ createdAt: -1 })
       .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
 
     if (testimonials?.length === 0) {
       throw new CustomError(404, "No testimonials found");
     }
+
+    //randomize the order of testimonials
+    testimonials.sort(() => Math.random() - 0.5);
 
     // Return testimonials
     return testimonials;
