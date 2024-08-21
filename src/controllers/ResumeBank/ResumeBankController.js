@@ -16,6 +16,26 @@ const getAllResumes = async (req, res) => {
   return sendResponse(res, 200, "Fetched all resumes", resumes);
 };
 
+//get resume count and job id for all resumes
+const getResumeCount = async (req, res) => {
+  //perform query on database
+  const resumes = await Resume.getResumeCount();
+  return sendResponse(res, 200, "Fetched all resumes", resumes);
+};
+
+//get all resume for one job
+const getAllResumesForOneJob = async (req, res) => {
+  const jobId = req?.params?.id;
+  //object id validation
+  if (!ObjectIdChecker(jobId)) {
+    return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  //perform query on database
+  const resumes = await Resume.getAllResumesForOneJob(jobId);
+  return sendResponse(res, 200, "Fetched all resumes", resumes);
+};
+
 //get one Resume using mongoose
 const getOneResume = async (req, res) => {
   const resumeId = req?.params?.id;
@@ -141,6 +161,8 @@ const deleteOneResume = async (req, res) => {
 
 module.exports = {
   getAllResumes: asyncHandler(getAllResumes),
+  getResumeCount: asyncHandler(getResumeCount),
+  getAllResumesForOneJob: asyncHandler(getAllResumesForOneJob),
   getOneResume: asyncHandler(getOneResume),
   createOneResume: asyncHandler(createOneResume),
   updateOneResume: asyncHandler(updateOneResume),

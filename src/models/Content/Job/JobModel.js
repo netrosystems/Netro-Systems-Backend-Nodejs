@@ -85,8 +85,8 @@ jobSchema.pre("save", function (next) {
 // Define a static method to get all jobs
 jobSchema.statics.getAllJobs = async function () {
   try {
-    // Find all jobs and populate the jobedBy field while excluding the password field
-    const jobs = await this.find()
+    // Find all jobs and populate the jobsBy field while excluding the password field
+    const jobs = await this.find({ status: { $ne: "inactive" } })
       .sort({ createdAt: -1 })
       .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
 

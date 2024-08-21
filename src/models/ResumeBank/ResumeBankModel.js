@@ -83,10 +83,78 @@ resumeSchema.pre("save", function (next) {
 resumeSchema.statics.getAllResumes = async function () {
   try {
     // Find all resumes and populate the resumeedBy field while excluding the password field
-    const resumes = await this.find().sort({ createdAt: -1 });
+    const resumes = await this.find().sort({ createdAt: -1 }).populate("job", {
+      title: 1,
+      category: 1,
+      publishedAt: 1,
+      _id: 0,
+    });
 
     if (resumes?.length === 0) {
       throw new CustomError(404, "No resumes found");
+    }
+
+    // Return resumes
+    return resumes;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+//get resume count and job id for all resumes
+resumeSchema.statics.getResumeCount = async function () {
+  try {
+    // Aggregate resumes, group by job
+    const resumes = await this.aggregate([
+      {
+        $group: {
+          _id: "$job",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+    ]);
+
+    // Populate the job field in the aggregated results
+    const populatedResumes = await this.populate(resumes, {
+      path: "_id",
+      select: "title category publishedAt",
+      model: "Job",
+    });
+
+    // Remove objects where the populated _id is null or doesn't have a job
+    const filteredResumes = populatedResumes.filter(
+      (resume) => resume._id !== null
+    );
+
+    if (filteredResumes.length === 0) {
+      throw new CustomError(404, "No valid resumes found after population");
+    }
+
+    // Return the populated resumes
+    return filteredResumes;
+  } catch (error) {
+    throw new CustomError(error.statusCode || 500, error.message);
+  }
+};
+
+//get all resumes for a job
+resumeSchema.statics.getAllResumesForOneJob = async function (jobId) {
+  try {
+    // Find all resumes for a job and populate the resumeedBy field while excluding the password field
+    const resumes = await this.find({ job: jobId })
+      .sort({ createdAt: -1 })
+      .populate("job", {
+        title: 1,
+        category: 1,
+        publishedAt: 1,
+        _id: 0,
+      });
+
+    if (resumes?.length === 0) {
+      throw new CustomError(404, "No resumes found for this job");
     }
 
     // Return resumes
@@ -106,6 +174,14 @@ resumeSchema.statics.getOneResume = async function (resumeId) {
       throw new CustomError(404, "Resume not found");
     }
 
+    //populate the job field
+    await resume.populate("job", {
+      title: 1,
+      category: 1,
+      publishedAt: 1,
+      _id: 0,
+    });
+
     // Return resume
     return resume;
   } catch (error) {
@@ -118,6 +194,14 @@ resumeSchema.statics.createOneResume = async function (resumeData) {
   try {
     // Create resume
     const resume = await this.create(resumeData);
+
+    //populate the job field
+    await resume.populate("job", {
+      title: 1,
+      category: 1,
+      publishedAt: 1,
+      _id: 0,
+    });
 
     // Return resume
     return resume;
