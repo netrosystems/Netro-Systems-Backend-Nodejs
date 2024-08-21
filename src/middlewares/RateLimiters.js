@@ -2,9 +2,9 @@ const rateLimit = require("express-rate-limit");
 const { sendResponse } = require("../services/responseHandlers/HandleResponse");
 
 // Constants
-const MAX_LOGIN_ATTEMPTS = 50;
-const MAX_REGISTRATION_ATTEMPTS = 50;
-const WINDOW_TIME_FOR_LOGIN = 1 * 60 * 1000; // 1 minutes
+const MAX_LOGIN_ATTEMPTS = 3;
+const MAX_REGISTRATION_ATTEMPTS = 3;
+const WINDOW_TIME_FOR_LOGIN = 15 * 60 * 1000; // 15 minutes
 const WINDOW_TIME_FOR_REGISTRATION = 60 * 60 * 1000; // 1 hour
 
 // Function to create rate limiting middleware for login requests
@@ -35,8 +35,6 @@ const createRegisterRateLimiter = () => {
       const retryAfterSeconds = Math.ceil(
         (req.rateLimit.resetTime - Date.now()) / 1000
       );
-      const retryAfterMessage =
-        retryAfterSeconds > 0 ? ` in ${retryAfterSeconds} seconds` : "";
       res.setHeader("Retry-After", retryAfterSeconds);
       return sendResponse(
         res,

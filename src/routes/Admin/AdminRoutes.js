@@ -1,7 +1,11 @@
 //router/Admin/AdminRoutes.js
 
 const AdminRouter = require("express").Router();
-const { authorizeAdmin, loginRateLimiter } = require("../../middlewares");
+const {
+  authorizeAdmin,
+  loginRateLimiter,
+  registerRateLimiter,
+} = require("../../middlewares");
 
 //importing controllers
 const {
@@ -23,7 +27,7 @@ const {
 //routes
 AdminRouter.get("/find/:id", authorizeAdmin, getOneAdmin);
 AdminRouter.get("/all", authorizeAdmin, getAllAdmins);
-AdminRouter.post("/register", registerAdmin);
+AdminRouter.post("/register", registerRateLimiter, registerAdmin);
 AdminRouter.post("/login", loginRateLimiter, loginAdmin);
 AdminRouter.post("/2fa", verify2FA);
 AdminRouter.post("/2fa/setup/:id", initiate2FASetup);
