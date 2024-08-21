@@ -76,6 +76,7 @@ const createOnePortfolio = async (req, res) => {
     investment,
     expansion,
     salesIncreased,
+    metaTitle,
     metaTags,
     metaDescription,
   } = data;
@@ -94,7 +95,7 @@ const createOnePortfolio = async (req, res) => {
     !investment ||
     !expansion ||
     !salesIncreased ||
-    !metaTags ||
+    !metaTitle ||
     !metaDescription
   ) {
     throw new CustomError(
@@ -124,6 +125,7 @@ const createOnePortfolio = async (req, res) => {
     investment,
     expansion,
     salesIncreased,
+    metaTitle,
     metaTags,
     metaDescription,
   };

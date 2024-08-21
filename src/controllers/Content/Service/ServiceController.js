@@ -35,13 +35,21 @@ const createOneService = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const files = req?.files;
 
-  const { title, category, content, metaTags, metaDescription, tags } = data;
+  const {
+    title,
+    category,
+    content,
+    metaTitle,
+    metaTags,
+    metaDescription,
+    tags,
+  } = data;
 
   if (
     !title ||
     !category ||
     !content ||
-    !metaTags ||
+    !metaTitle ||
     !metaDescription ||
     !tags
   ) {
@@ -62,6 +70,7 @@ const createOneService = async (req, res) => {
     title,
     category,
     content,
+    metaTitle,
     metaTags,
     metaDescription,
     tags,
