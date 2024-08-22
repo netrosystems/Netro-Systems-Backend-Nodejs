@@ -45,8 +45,6 @@ const createOneTestimonial = async (req, res) => {
     throw new CustomError(401, "Unauthorized user");
   }
 
-  console.log("user", req?.auth);
-
   const { name, occupation, review } = data;
 
   if (!name || !occupation || !review) {

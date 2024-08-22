@@ -33,11 +33,6 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  metaTags: {
-    type: [String],
-    default: [],
-    required: true,
-  },
   metaDescription: {
     type: String,
     default: "",

@@ -76,7 +76,7 @@ const createOnePortfolio = async (req, res) => {
     investment,
     expansion,
     salesIncreased,
-    metaTags,
+    metaTitle,
     metaDescription,
   } = data;
 
@@ -94,12 +94,12 @@ const createOnePortfolio = async (req, res) => {
     !investment ||
     !expansion ||
     !salesIncreased ||
-    !metaTags ||
+    !metaTitle ||
     !metaDescription
   ) {
     throw new CustomError(
       400,
-      "These fields are required: title, videoUrl, clientOrigin, timeline, content, category, type, liveUrl,projectImages, userGained, investment, expansion, salesIncreased, metaTags, metaDescription"
+      "These fields are required: title, videoUrl, clientOrigin, timeline, content, category, type, liveUrl,projectImages, userGained, investment, expansion, salesIncreased, metaTitle, metaDescription"
     );
   }
 
@@ -124,7 +124,7 @@ const createOnePortfolio = async (req, res) => {
     investment,
     expansion,
     salesIncreased,
-    metaTags,
+    metaTitle,
     metaDescription,
   };
   const folderName = "portfolios";

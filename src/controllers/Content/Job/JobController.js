@@ -48,7 +48,7 @@ const createOneJob = async (req, res) => {
   ) {
     throw new CustomError(
       400,
-      "These fields are required: name, designation, facebook, twitter, linkedin, sjob, other"
+      "These fields are required: title, details, minimum, preferred, benefits, category, deadline"
     );
   }
 
