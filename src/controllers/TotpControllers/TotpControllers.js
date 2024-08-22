@@ -6,7 +6,7 @@ const {
 const generateTOTPAndQRCode = async (req, res) => {
   try {
     // Generate issuer and label server-side
-    const issuer = "Netro"; // Replace with your app's name
+    const issuer = process.env.TTOP_ISSUER; // Replace with your app's name
     const label = "AbdullahWins"; // Replace with a specific label
 
     console.log("Generating TOTP for issuer:", issuer, "and label:", label);

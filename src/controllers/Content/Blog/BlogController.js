@@ -56,19 +56,26 @@ const createOneBlog = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const files = req?.files;
 
-  const { title, category, content, metaTags, metaDescription, tags } = data;
+  const {
+    title,
+    category,
+    content,
+    metaTitle,
+    metaDescription,
+    tags,
+  } = data;
 
   if (
     !title ||
     !category ||
     !content ||
-    !metaTags ||
+    !metaTitle ||
     !metaDescription ||
     !tags
   ) {
     throw new CustomError(
       400,
-      "These fields are required: title, category, content, metaTags, metaDescription, tags"
+      "These fields are required: title, category, content, metaTitle, metaDescription, tags"
     );
   }
 
@@ -83,7 +90,7 @@ const createOneBlog = async (req, res) => {
     title,
     category,
     content,
-    metaTags,
+    metaTitle,
     metaDescription,
     tags,
   };
