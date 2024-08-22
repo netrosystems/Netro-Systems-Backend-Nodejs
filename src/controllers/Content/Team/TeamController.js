@@ -36,19 +36,8 @@ const createOneTeam = async (req, res) => {
 
   const { name, designation, facebook, twitter, linkedin, steam, other } = data;
 
-  if (
-    !name ||
-    !designation ||
-    !facebook ||
-    !twitter ||
-    !linkedin ||
-    !steam ||
-    !other
-  ) {
-    throw new CustomError(
-      400,
-      "These fields are required: name, designation, facebook, twitter, linkedin, steam, other"
-    );
+  if (!name || !designation) {
+    throw new CustomError(400, "These fields are required: name, designation");
   }
 
   //validate authority from middleware authentication

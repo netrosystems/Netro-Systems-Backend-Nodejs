@@ -231,7 +231,7 @@ adminSchema.statics.initiate2FASetup = async function ({ adminId }) {
     }
 
     // Generate a secret key and QR code
-    const issuer = "Netro"; // Replace with your app's name
+    const issuer = process.env.TTOP_ISSUER; // Replace with your app's name
     const label = admin.email; // Use the admin's email as the label
     const { secret, qrCode, totp } = await generateOTP(issuer, label);
 

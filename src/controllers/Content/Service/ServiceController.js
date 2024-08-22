@@ -40,7 +40,6 @@ const createOneService = async (req, res) => {
     category,
     content,
     metaTitle,
-    metaTags,
     metaDescription,
     tags,
   } = data;
@@ -55,7 +54,7 @@ const createOneService = async (req, res) => {
   ) {
     throw new CustomError(
       400,
-      "These fields are required: title, category, content, metaTags, metaDescription, tags"
+      "These fields are required: title, category, content, metaTitle, metaDescription, tags"
     );
   }
 
@@ -71,7 +70,6 @@ const createOneService = async (req, res) => {
     category,
     content,
     metaTitle,
-    metaTags,
     metaDescription,
     tags,
   };

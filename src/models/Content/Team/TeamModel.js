@@ -47,7 +47,6 @@ const teamSchema = new mongoose.Schema({
   image: {
     type: String,
     default: "https://via.placeholder.com/150",
-    required: true,
   },
   qrCode: {
     type: String,
@@ -57,7 +56,6 @@ const teamSchema = new mongoose.Schema({
     type: String,
     enum: ["active", "inactive"],
     default: "active",
-    required: true,
   },
   publishedAt: {
     type: Number,
