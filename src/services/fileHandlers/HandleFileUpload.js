@@ -3,9 +3,9 @@ const path = require("path");
 const mime = require("mime-types");
 const { UniqueNaam } = require("uniquenaam/uniquenaam");
 const { getServerBaseUrl } = require("../urlHandlers/HandleBaseUrl");
-const {
-  compressImage,
-} = require("../fileModificationHandlers/HandleCompression");
+// const {
+//   compressImage,
+// } = require("../fileModificationHandlers/HandleCompression");
 const { CustomError } = require("../responseHandlers/HandleResponse");
 
 const handleFileUpload = async ({ req, files, folderName }) => {
@@ -27,7 +27,8 @@ const handleFileUpload = async ({ req, files, folderName }) => {
       const mimeType = mime.lookup(file.originalname);
       if (mimeType && mimeType.startsWith("image/")) {
         //compress only image files
-        const compressedSource = await compressImage(source);
+        // const compressedSource = await compressImage(source);
+        const compressedSource = source;
 
         // Ensure the source file exists before moving
         try {
