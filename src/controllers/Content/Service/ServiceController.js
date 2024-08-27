@@ -30,19 +30,20 @@ const getOneService = async (req, res) => {
   return sendResponse(res, 200, "Service retrieved successfully", service);
 };
 
+//get service by title using mongoose
+const getServiceByTitle = async (req, res) => {
+  const serviceTitle = req?.params?.title;
+  //perform query on database
+  const service = await Service.getServiceByTitle(serviceTitle);
+  return sendResponse(res, 200, "Service retrieved successfully", service);
+};
+
 // Create a new Service
 const createOneService = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const files = req?.files;
 
-  const {
-    title,
-    category,
-    content,
-    metaTitle,
-    metaDescription,
-    tags,
-  } = data;
+  const { title, category, content, metaTitle, metaDescription, tags } = data;
 
   if (
     !title ||
@@ -137,6 +138,7 @@ const deleteOneService = async (req, res) => {
 module.exports = {
   getAllServices: asyncHandler(getAllServices),
   getOneService: asyncHandler(getOneService),
+  getServiceByTitle: asyncHandler(getServiceByTitle),
   createOneService: asyncHandler(createOneService),
   updateOneService: asyncHandler(updateOneService),
   deleteOneService: asyncHandler(deleteOneService),

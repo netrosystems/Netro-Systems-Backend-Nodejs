@@ -114,6 +114,25 @@ blogSchema.statics.getOneBlog = async function (blogId) {
   }
 };
 
+//get blog by title (case insensitive)
+blogSchema.statics.getBlogByTitle = async function (blogTitle) {
+  try {
+    // Find blog by title and populate the blogedBy field while excluding the password field
+    const blog = await this.findOne({
+      title: { $regex: new RegExp(`^${blogTitle}$`, "i") },
+    }).populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (!blog) {
+      throw new CustomError(404, "Blog not found");
+    }
+
+    // Return blog
+    return blog;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 // Define a static method to get 3 most recent blogs
 blogSchema.statics.getMostRecentBlogs = async function () {
   try {

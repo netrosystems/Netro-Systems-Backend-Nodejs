@@ -146,6 +146,25 @@ portfolioSchema.statics.getOnePortfolio = async function (portfolioId) {
   }
 };
 
+// Define a static method to get portfolios by title
+portfolioSchema.statics.getPortfolioByTitle = async function (portfolioTitle) {
+  try {
+    // Find portfolio by title and populate the portfolioedBy field while excluding the password field
+    const portfolio = await this.findOne({
+      title: { $regex: new RegExp(`^${portfolioTitle}$`, "i") },
+    }).populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (!portfolio) {
+      throw new CustomError(404, "Portfolio not found");
+    }
+
+    // Return portfolio
+    return portfolio;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 // Define  a static method to get related portfolios by category
 portfolioSchema.statics.getRelatedPortfoliosByCategory = async function (
   portfolioCategory

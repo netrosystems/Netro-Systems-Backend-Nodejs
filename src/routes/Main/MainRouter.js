@@ -26,7 +26,7 @@ MainRouter.use("/admins", AdminRouter);
 MainRouter.use("/blogs", BlogRouter);
 MainRouter.use("/blog-categories", BlogCategoryRouter);
 MainRouter.use("/services", ServiceRouter);
-MainRouter.use("/protfolios", PortfolioRouter);
+MainRouter.use("/portfolios", PortfolioRouter);
 MainRouter.use("/portfolio-categories", PortfolioCategoryRouter);
 MainRouter.use("/teams", TeamRouter);
 MainRouter.use("/jobs", JobRouter);
