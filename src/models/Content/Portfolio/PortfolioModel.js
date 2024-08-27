@@ -170,6 +170,18 @@ portfolioSchema.statics.getRelatedPortfoliosByCategory = async function (
 // Define a static method to create a portfolio
 portfolioSchema.statics.createOnePortfolio = async function (portfolioData) {
   try {
+    //check if the title already exists (case insensitive)
+    const portfolioExists = await this.findOne({
+      title: { $regex: new RegExp(`^${portfolioData.title}$`, "i") },
+    });
+
+    if (portfolioExists) {
+      throw new CustomError(
+        400,
+        "Portfolio already exists with the same title"
+      );
+    }
+
     // Create portfolio
     const portfolio = await this.create(portfolioData);
 

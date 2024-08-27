@@ -175,6 +175,15 @@ blogSchema.statics.getFeaturedBlogs = async function () {
 // Define a static method to create a blog
 blogSchema.statics.createOneBlog = async function (blogData) {
   try {
+    //check if the title already exists (case insensitive)
+    const blogExists = await this.findOne({
+      title: { $regex: new RegExp(`^${blogData.title}$`, "i") },
+    });
+
+    if (blogExists) {
+      throw new CustomError(400, "Blog already exists with the same title");
+    }
+
     // Create blog
     const blog = await this.create(blogData);
 
