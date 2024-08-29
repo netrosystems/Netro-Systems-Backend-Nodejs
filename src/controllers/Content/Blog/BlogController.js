@@ -29,6 +29,14 @@ const getOneBlog = async (req, res) => {
   return sendResponse(res, 200, "Blog retrieved successfully", blog);
 };
 
+//get blog by title using mongoose
+const getBlogByTitle = async (req, res) => {
+  const blogTitle = req?.params?.title;
+  //perform query on database
+  const blog = await Blog.getBlogByTitle(blogTitle);
+  return sendResponse(res, 200, "Blog retrieved successfully", blog);
+};
+
 //get 3 most recent Blog using mongoose
 const getMostRecentBlogs = async (req, res) => {
   //perform query on database
@@ -56,14 +64,7 @@ const createOneBlog = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const files = req?.files;
 
-  const {
-    title,
-    category,
-    content,
-    metaTitle,
-    metaDescription,
-    tags,
-  } = data;
+  const { title, category, content, metaTitle, metaDescription, tags } = data;
 
   if (
     !title ||
@@ -169,6 +170,7 @@ const deleteOneBlog = async (req, res) => {
 module.exports = {
   getAllBlogs: asyncHandler(getAllBlogs),
   getOneBlog: asyncHandler(getOneBlog),
+  getBlogByTitle: asyncHandler(getBlogByTitle),
   getMostRecentBlogs: asyncHandler(getMostRecentBlogs),
   getBlogsByCategory: asyncHandler(getBlogsByCategory),
   getFeaturedBlogs: asyncHandler(getFeaturedBlogs),

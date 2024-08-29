@@ -29,6 +29,14 @@ const getOnePortfolio = async (req, res) => {
   return sendResponse(res, 200, "Portfolio retrieved successfully", portfolio);
 };
 
+//get portfolio by title using mongoose
+const getPortfolioByTitle = async (req, res) => {
+  const portfolioTitle = req?.params?.title;
+  //perform query on database
+  const portfolio = await Portfolio.getPortfolioByTitle(portfolioTitle);
+  return sendResponse(res, 200, "Portfolio retrieved successfully", portfolio);
+};
+
 //get related portfolios using mongoose
 const getRelatedPortfoliosByCategory = async (req, res) => {
   const portfolioCategory = req?.params?.category;
@@ -227,6 +235,7 @@ const deleteOnePortfolio = async (req, res) => {
 module.exports = {
   getAllPortfolios: asyncHandler(getAllPortfolios),
   getOnePortfolio: asyncHandler(getOnePortfolio),
+  getPortfolioByTitle: asyncHandler(getPortfolioByTitle),
   getRelatedPortfoliosByCategory: asyncHandler(getRelatedPortfoliosByCategory),
   createOnePortfolio: asyncHandler(createOnePortfolio),
   updateOnePortfolio: asyncHandler(updateOnePortfolio),

@@ -3,6 +3,7 @@ const BlogRouter = require("express").Router();
 const {
   getAllBlogs,
   getOneBlog,
+  getBlogByTitle,
   getMostRecentBlogs,
   getBlogsByCategory,
   getFeaturedBlogs,
@@ -15,6 +16,7 @@ const { authorizeAdmin } = require("../../middlewares");
 
 BlogRouter.get("/all", getAllBlogs);
 BlogRouter.get("/find/:id", getOneBlog);
+BlogRouter.get("/find-by-title/:title", getBlogByTitle);
 BlogRouter.get("/recent", getMostRecentBlogs);
 BlogRouter.get("/category/:category", getBlogsByCategory);
 BlogRouter.get("/featured", getFeaturedBlogs);
