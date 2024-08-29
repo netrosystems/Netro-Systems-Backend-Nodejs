@@ -110,9 +110,41 @@ serviceSchema.statics.getOneService = async function (serviceId) {
   }
 };
 
+//get a service by title
+serviceSchema.statics.getServiceByTitle = async function (title) {
+  try {
+    // Find service by title and populate the serviceedBy field while excluding the password field
+    const service = await this.findOne({
+      title: { $regex: new RegExp(`^${title}$`, "i") },
+    }).populate("author", {
+      fullName: 1,
+      profileImage: 1,
+      _id: 0,
+    });
+
+    if (!service) {
+      throw new CustomError(404, "Service not found");
+    }
+
+    // Return service
+    return service;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 // Define a static method to create a service
 serviceSchema.statics.createOneService = async function (serviceData) {
   try {
+    //check if the title already exists (case insensitive)
+    const serviceExists = await this.findOne({
+      title: { $regex: new RegExp(`^${serviceData.title}$`, "i") },
+    });
+
+    if (serviceExists) {
+      throw new CustomError(400, "Service already exists with the same title");
+    }
+
     // Create service
     const service = await this.create(serviceData);
 
