@@ -5,9 +5,10 @@
  * @param {Express.Request} req - The Express request object.
  * @returns {string} The server's base URL.
  */
+
 const getServerBaseUrl = (req) => {
   // Construct the server base URL
-  const serverBaseUrl = `${req.protocol}://${req.get("host")}`;
+  const serverBaseUrl = `https://${req.get("host")}`;
   return serverBaseUrl;
 };
 

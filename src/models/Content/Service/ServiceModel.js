@@ -207,6 +207,19 @@ serviceSchema.statics.deleteOneService = async function (serviceId) {
   }
 };
 
+//count documents
+serviceSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 const Service = mongoose.model("Service", serviceSchema);
 
 module.exports = Service;

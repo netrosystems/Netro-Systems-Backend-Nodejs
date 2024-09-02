@@ -18,6 +18,7 @@ const JobCategoryRouter = require("../Content/JobCategoryRoutes");
 const ResumeRouter = require("../ResumeBank/ResumeBankRoutes");
 const TestimonialRouter = require("../Testimonial/TestimonialRoutes");
 const LeadRouter = require("../Settings/Lead/LeadRoutes");
+const DashboardRouter = require("../Dashboard/DashboardRoutes");
 
 const faRouter = require("../Totp/TotpRoutes");
 
@@ -34,6 +35,7 @@ MainRouter.use("/job-categories", JobCategoryRouter);
 MainRouter.use("/resumes", ResumeRouter);
 MainRouter.use("/testimonials", TestimonialRouter);
 MainRouter.use("/leads", LeadRouter);
+MainRouter.use("/dashboard", DashboardRouter);
 
 MainRouter.use("/2fa", faRouter);
 

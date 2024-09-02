@@ -38,7 +38,7 @@ const resumeSchema = new mongoose.Schema({
     trim: true,
   },
   salaryExpectation: {
-    type: Number,
+    type: String,
     required: true,
   },
   experience: {
@@ -245,6 +245,19 @@ resumeSchema.statics.deleteOneResume = async function (resumeId) {
 
     // Return resume
     return resume;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+//count documents
+resumeSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }

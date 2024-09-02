@@ -197,6 +197,19 @@ teamSchema.statics.deleteOneTeam = async function (teamId) {
   }
 };
 
+//count documents
+teamSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 const Team = mongoose.model("Team", teamSchema);
 
 module.exports = Team;

@@ -228,6 +228,19 @@ jobSchema.statics.deleteOneJob = async function (jobId) {
   }
 };
 
+//count documents
+jobSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 const Job = mongoose.model("Job", jobSchema);
 
 module.exports = Job;

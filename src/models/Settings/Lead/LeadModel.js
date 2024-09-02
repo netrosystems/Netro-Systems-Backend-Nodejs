@@ -116,6 +116,19 @@ leadSchema.statics.deleteOneLead = async function (leadId) {
   }
 };
 
+//count documents
+leadSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 const Lead = mongoose.model("Lead", leadSchema);
 
 module.exports = Lead;
