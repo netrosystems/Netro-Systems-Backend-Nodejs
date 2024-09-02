@@ -263,6 +263,19 @@ portfolioSchema.statics.deleteOnePortfolio = async function (portfolioId) {
   }
 };
 
+//count documents
+portfolioSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 const Portfolio = mongoose.model("Portfolio", portfolioSchema);
 
 module.exports = Portfolio;

@@ -283,6 +283,19 @@ blogSchema.statics.deleteOneBlog = async function (blogId) {
   }
 };
 
+//count documents
+blogSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 const Blog = mongoose.model("Blog", blogSchema);
 
 module.exports = Blog;

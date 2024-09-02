@@ -165,6 +165,19 @@ testimonialSchema.statics.deleteOneTestimonial = async function (
   }
 };
 
+//count documents
+testimonialSchema.statics.countDocuments = async function () {
+  try {
+    // Count all documents
+    const count = await this.find().countDocuments();
+
+    // Return count
+    return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 const Testimonial = mongoose.model("Testimonial", testimonialSchema);
 
 module.exports = Testimonial;
