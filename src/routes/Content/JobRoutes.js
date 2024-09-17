@@ -2,6 +2,7 @@ const JobRouter = require("express").Router();
 
 const {
   getAllJobs,
+  getAllActiveJobs,
   getOneJob,
   createOneJob,
   updateOneJob,
@@ -11,6 +12,7 @@ const {
 const { authorizeAdmin } = require("../../middlewares");
 
 JobRouter.get("/all", getAllJobs);
+JobRouter.get("/active", getAllActiveJobs);
 JobRouter.get("/find/:id", getOneJob);
 JobRouter.post("/create", authorizeAdmin, createOneJob);
 JobRouter.patch("/update/:id", authorizeAdmin, updateOneJob);

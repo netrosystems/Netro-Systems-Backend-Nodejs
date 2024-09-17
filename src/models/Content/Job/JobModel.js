@@ -86,6 +86,25 @@ jobSchema.pre("save", function (next) {
 jobSchema.statics.getAllJobs = async function () {
   try {
     // Find all jobs and populate the jobsBy field while excluding the password field
+    const jobs = await this.find()
+      .sort({ createdAt: -1 })
+      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (jobs?.length === 0) {
+      throw new CustomError(404, "No jobs found");
+    }
+
+    // Return jobs
+    return jobs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+// Define a static method to get all jobs
+jobSchema.statics.getAllActiveJobs = async function () {
+  try {
+    // Find all jobs and populate the jobsBy field while excluding the password field
     const jobs = await this.find({ status: { $ne: "inactive" } })
       .sort({ createdAt: -1 })
       .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
