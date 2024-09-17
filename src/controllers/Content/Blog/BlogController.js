@@ -31,7 +31,9 @@ const getOneBlog = async (req, res) => {
 
 //get blog by title using mongoose
 const getBlogByTitle = async (req, res) => {
-  const blogTitle = req?.params?.title;
+  const title = req.params[0]; // This captures the entire title after /find-by-title/
+  const blogTitle = decodeURIComponent(title); // Decode the title
+  // const blogTitle = req?.params?.title;
   //perform query on database
   const blog = await Blog.getBlogByTitle(blogTitle);
   return sendResponse(res, 200, "Blog retrieved successfully", blog);

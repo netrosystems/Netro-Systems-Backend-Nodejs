@@ -16,6 +16,13 @@ const getAllJobs = async (req, res) => {
   return sendResponse(res, 200, "Fetched all jobs", jobs);
 };
 
+//get all active Job using mongoose
+const getAllActiveJobs = async (req, res) => {
+  //perform query on database
+  const jobs = await Job.getAllActiveJobs();
+  return sendResponse(res, 200, "Fetched all active jobs", jobs);
+};
+
 //get one Job using mongoose
 const getOneJob = async (req, res) => {
   const jobId = req?.params?.id;
@@ -142,6 +149,7 @@ const deleteOneJob = async (req, res) => {
 
 module.exports = {
   getAllJobs: asyncHandler(getAllJobs),
+  getAllActiveJobs: asyncHandler(getAllActiveJobs),
   getOneJob: asyncHandler(getOneJob),
   createOneJob: asyncHandler(createOneJob),
   updateOneJob: asyncHandler(updateOneJob),
