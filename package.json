@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "jest",
-    "prepare": "husky install"
+    "test": "jest"
   },
   "author": "abdullahwins",
   "license": "ISC",
