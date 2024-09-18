@@ -6,7 +6,6 @@ const {
   handleFileUpload,
   sendResponse,
   ObjectIdChecker,
-  logger,
   CustomError,
 } = require("../../../services");
 
@@ -32,7 +31,10 @@ const getOneService = async (req, res) => {
 
 //get service by title using mongoose
 const getServiceByTitle = async (req, res) => {
-  const serviceTitle = req?.params?.title;
+  const title = req.params[0]; // This captures the entire title after /find-by-title/
+  const serviceTitle = decodeURIComponent(title); // Decode the title
+  console.log("serviceTitle", serviceTitle);
+  // const serviceTitle = req?.params?.title;
   //perform query on database
   const service = await Service.getServiceByTitle(serviceTitle);
   return sendResponse(res, 200, "Service retrieved successfully", service);
