@@ -149,9 +149,13 @@ portfolioSchema.statics.getOnePortfolio = async function (portfolioId) {
 // Define a static method to get portfolios by title
 portfolioSchema.statics.getPortfolioByTitle = async function (portfolioTitle) {
   try {
+    function escapeRegex(title) {
+      return title.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    }
+    const escapedTitle = escapeRegex(portfolioTitle);
     // Find portfolio by title and populate the portfolioedBy field while excluding the password field
     const portfolio = await this.findOne({
-      title: { $regex: new RegExp(`^${portfolioTitle}$`, "i") },
+      title: { $regex: new RegExp(`^${escapedTitle}$`, "i") },
     }).populate("author", { fullName: 1, profileImage: 1, _id: 0 });
 
     if (!portfolio) {

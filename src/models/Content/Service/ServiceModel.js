@@ -113,9 +113,13 @@ serviceSchema.statics.getOneService = async function (serviceId) {
 //get a service by title
 serviceSchema.statics.getServiceByTitle = async function (title) {
   try {
+    function escapeRegex(title) {
+      return title.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    }
+    const escapedTitle = escapeRegex(title);
     // Find service by title and populate the serviceedBy field while excluding the password field
     const service = await this.findOne({
-      title: { $regex: new RegExp(`^${title}$`, "i") },
+      title: { $regex: new RegExp(`^${escapedTitle}$`, "i") },
     }).populate("author", {
       fullName: 1,
       profileImage: 1,

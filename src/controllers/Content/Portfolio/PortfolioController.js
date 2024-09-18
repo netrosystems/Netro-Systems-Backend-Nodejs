@@ -31,7 +31,9 @@ const getOnePortfolio = async (req, res) => {
 
 //get portfolio by title using mongoose
 const getPortfolioByTitle = async (req, res) => {
-  const portfolioTitle = req?.params?.title;
+  const title = req.params[0]; // This captures the entire title after /find-by-title/
+  const portfolioTitle = decodeURIComponent(title); // Decode the title
+  // const portfolioTitle = req?.params?.title;
   //perform query on database
   const portfolio = await Portfolio.getPortfolioByTitle(portfolioTitle);
   return sendResponse(res, 200, "Portfolio retrieved successfully", portfolio);
