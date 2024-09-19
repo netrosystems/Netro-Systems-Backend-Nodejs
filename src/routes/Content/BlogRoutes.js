@@ -2,6 +2,7 @@ const BlogRouter = require("express").Router();
 
 const {
   getAllBlogs,
+  getBlogsForLandingPage,
   getOneBlog,
   getBlogByTitle,
   getMostRecentBlogs,
@@ -15,6 +16,7 @@ const {
 const { authorizeAdmin } = require("../../middlewares");
 
 BlogRouter.get("/all", getAllBlogs);
+BlogRouter.get("/landing", getBlogsForLandingPage);
 BlogRouter.get("/find/:id", getOneBlog);
 BlogRouter.get("/find-by-title/*", getBlogByTitle);
 BlogRouter.get("/recent", getMostRecentBlogs);

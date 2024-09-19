@@ -16,6 +16,13 @@ const getAllBlogs = async (req, res) => {
   return sendResponse(res, 200, "Fetched all blogs", blogs);
 };
 
+//get 3 featured Blog using mongoose
+const getBlogsForLandingPage = async (req, res) => {
+  //perform query on database
+  const blogs = await Blog.getBlogsForLandingPage();
+  return sendResponse(res, 200, "Fetched featured blogs", blogs);
+};
+
 //get one Blog using mongoose
 const getOneBlog = async (req, res) => {
   const blogId = req?.params?.id;
@@ -171,6 +178,7 @@ const deleteOneBlog = async (req, res) => {
 
 module.exports = {
   getAllBlogs: asyncHandler(getAllBlogs),
+  getBlogsForLandingPage: asyncHandler(getBlogsForLandingPage),
   getOneBlog: asyncHandler(getOneBlog),
   getBlogByTitle: asyncHandler(getBlogByTitle),
   getMostRecentBlogs: asyncHandler(getMostRecentBlogs),
