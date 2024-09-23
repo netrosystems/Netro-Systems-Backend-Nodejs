@@ -93,6 +93,26 @@ blogSchema.statics.getAllBlogs = async function () {
   }
 };
 
+//get blogs for landing page (3 random featured blog)
+blogSchema.statics.getBlogsForLandingPage = async function () {
+  try {
+    // Find featured blogs and populate the blogedBy field while excluding the password field random 3
+    const blogs = await this.find()
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No featured blogs found");
+    }
+
+    // Return blogs
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
 // Define a static method to get one blog by id
 blogSchema.statics.getOneBlog = async function (blogId) {
   try {
