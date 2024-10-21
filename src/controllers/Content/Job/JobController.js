@@ -110,8 +110,8 @@ const updateOneJob = async (req, res) => {
       files: files?.single,
       folderName,
     });
-    const image = fileUrls[0];
-    updatedData = { ...updatedData, image };
+    const featuredImage = fileUrls[0];
+    updatedData = { ...updatedData, featuredImage };
   }
 
   //perform query on database
