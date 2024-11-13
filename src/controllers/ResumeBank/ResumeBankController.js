@@ -83,6 +83,12 @@ const createOneResume = async (req, res) => {
     );
   }
 
+  //check if the user already applied for this job
+  const resumeExists = await Resume.checkIfResumeExists({ email, job });
+  if (resumeExists) {
+    throw new CustomError(400, "You have already applied for this job");
+  }
+
   let updatedData = {
     job,
     name,
