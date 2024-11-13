@@ -18,7 +18,6 @@ const resumeSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true,
     lowercase: true,
     required: true,
     validate: {
@@ -258,6 +257,19 @@ resumeSchema.statics.countDocuments = async function () {
 
     // Return count
     return count;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+//check if the user has already applied for this job
+resumeSchema.statics.checkIfResumeExists = async function ({ email, job }) {
+  try {
+    // Find resume by email and job
+    const resume = await this.findOne({ email, job });
+
+    // Return resume
+    return resume;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
