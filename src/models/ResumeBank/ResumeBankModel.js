@@ -20,6 +20,7 @@ const resumeSchema = new mongoose.Schema({
     type: String,
     lowercase: true,
     required: true,
+    maxlength: 50,
     validate: {
       validator: (value) => /\S+@\S+\.\S+/.test(value),
       message: (props) => `${props.value} is not a valid email address!`,
@@ -35,20 +36,24 @@ const resumeSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    maxlength: 150,
   },
   salaryExpectation: {
     type: String,
     required: true,
+    maxlength: 15,
   },
   experience: {
     type: String,
     required: true,
     trim: true,
+    maxlength: 150,
   },
   previousCompany: {
     type: String,
     required: true,
     trim: true,
+    maxlength: 150,
   },
   liveUrl: {
     type: String,
@@ -59,6 +64,7 @@ const resumeSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    maxlength: 500,
   },
   createdAt: {
     type: Number,
