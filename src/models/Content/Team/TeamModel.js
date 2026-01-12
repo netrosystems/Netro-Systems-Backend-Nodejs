@@ -12,17 +12,26 @@ const teamSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin",
     default: null,
-    required: true,
+    required: [true, "author is required"],
   },
   name: {
     type: String,
-    required: true,
     trim: true,
     maxlength: 150,
+    required: [true, "name is required"],
   },
   designation: {
     type: String,
-    required: true,
+    required: [true, "designation is required"],
+  },
+  order: {
+    type: Number,
+    default: 0,
+    required: [true, "order is required"],
+    validate: {
+      validator: (val) => val.toString().length <= 5,
+      message: "Order cannot be longer than 5 digits",
+    },
   },
   facebook: {
     type: String,
@@ -47,6 +56,7 @@ const teamSchema = new mongoose.Schema({
   image: {
     type: String,
     default: "https://via.placeholder.com/150",
+    required: [true, "image is required"],
   },
   qrCode: {
     type: String,
@@ -60,17 +70,17 @@ const teamSchema = new mongoose.Schema({
   publishedAt: {
     type: Number,
     default: () => Timekoto(),
-    required: true,
+    required: [true, "publishedAt is required"],
   },
   createdAt: {
     type: Number,
     default: () => Timekoto(),
-    required: true,
+    required: [true, "createdAt is required"],
   },
   updatedAt: {
     type: Number,
     default: () => Timekoto(),
-    required: true,
+    required: [true, "updatedAt is required"],
   },
 });
 
@@ -88,11 +98,11 @@ teamSchema.statics.getAllTeams = async function () {
   try {
     // Find all teams and populate the teamedBy field while excluding the password field
     const teams = await this.find()
-      .sort({ createdAt: -1 })
+      .sort({ order: 1 })
       .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
 
     if (teams?.length === 0) {
-      throw new CustomError(404, "No teams found");
+      throw new CustomError(404, "No team members found");
     }
 
     // Return teams
@@ -113,7 +123,7 @@ teamSchema.statics.getOneTeam = async function (teamId) {
     });
 
     if (!team) {
-      throw new CustomError(404, "Team not found");
+      throw new CustomError(404, "Team member not found");
     }
 
     // Return team
@@ -157,7 +167,7 @@ teamSchema.statics.updateOneTeam = async function ({ teamId, updatedData }) {
     const team = await this.findById(teamId);
 
     if (!team) {
-      throw new CustomError(404, "Team not found");
+      throw new CustomError(404, "Team member not found");
     }
 
     // Update the fields of the team document
@@ -187,7 +197,7 @@ teamSchema.statics.deleteOneTeam = async function (teamId) {
     const team = await this.findByIdAndDelete(teamId);
 
     if (!team) {
-      throw new CustomError(404, "Team not found");
+      throw new CustomError(404, "Team member not found");
     }
 
     // Return team
