@@ -7,9 +7,16 @@ const {
 const sendPasswordResetOTPEmail = async ({ email, code }) => {
   try {
     // Read the HTML template file
+    // const emailTemplatePath = path.join(
+    //   __dirname,
+    //   "../../views/emails/ResetPassword.html"
+    // );
+    // Read the HTML template file
     const emailTemplatePath = path.join(
-      __dirname,
-      "../../views/emails/ResetPassword.html"
+      process.cwd(),
+      "views",
+      "emails",
+      "ResetPassword.html"
     );
     const emailTemplate = fs.readFileSync(emailTemplatePath, "utf-8");
 
@@ -31,10 +38,19 @@ const sendPasswordResetOTPEmail = async ({ email, code }) => {
 const sendEmail = async (receiver, subject, code) => {
   try {
     // Read the HTML template file
+    // const emailTemplatePath = path.join(
+    //   __dirname,
+    //   "../../views/emails/ResetPassword.html"
+    // );
+
+    // Read the HTML template file
     const emailTemplatePath = path.join(
-      __dirname,
-      "../../views/emails/ResetPassword.html"
+      process.cwd(),
+      "views",
+      "emails",
+      "ResetPassword.html"
     );
+
     const emailTemplate = fs.readFileSync(emailTemplatePath, "utf-8");
 
     // Replace placeholders in the template

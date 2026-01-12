@@ -12,6 +12,7 @@ const {
   updateOneBlog,
   toggleFeaturedStatus,
   deleteOneBlog,
+  getBlogBySlug,
 } = require("../../controllers/Content/Blog/BlogController");
 const { authorizeAdmin } = require("../../middlewares");
 
@@ -19,6 +20,7 @@ BlogRouter.get("/all", getAllBlogs);
 BlogRouter.get("/landing", getBlogsForLandingPage);
 BlogRouter.get("/find/:id", getOneBlog);
 BlogRouter.get("/find-by-title/*", getBlogByTitle);
+BlogRouter.get("/find-by-slug/:slug", getBlogBySlug);
 BlogRouter.get("/recent", getMostRecentBlogs);
 BlogRouter.get("/category/:category", getBlogsByCategory);
 BlogRouter.get("/featured", getFeaturedBlogs);

@@ -1,10 +1,10 @@
 // __tests__/encryptionHandlers.test.js
 
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { hashPassword, comparePasswords } = require("./HandleBcrypt");
 const { logger } = require("../logHandlers/HandleWinston");
 
-jest.mock("bcrypt");
+jest.mock("bcryptjs");
 jest.mock("../logHandlers/HandleWinston", () => ({
   logger: {
     log: jest.fn(),
