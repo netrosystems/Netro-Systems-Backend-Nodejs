@@ -8,6 +8,7 @@ const {
   ObjectIdChecker,
   CustomError,
 } = require("../../../services");
+const { generateUniqueSlug } = require("../../../services/slugHandlers/HandleSlug");
 
 //get all Blog using mongoose
 const getAllBlogs = async (req, res) => {
@@ -46,6 +47,13 @@ const getBlogByTitle = async (req, res) => {
   return sendResponse(res, 200, "Blog retrieved successfully", blog);
 };
 
+//get blog by title using mongoose
+const getBlogBySlug = async (req, res) => {
+  const slug = req?.params?.slug;
+  const blog = await Blog.getBlogBySlug(slug);
+  return sendResponse(res, 200, "Blog retrieved successfully", blog);
+};
+
 //get 3 most recent Blog using mongoose
 const getMostRecentBlogs = async (req, res) => {
   //perform query on database
@@ -71,53 +79,101 @@ const getFeaturedBlogs = async (req, res) => {
 // Create a new Blog
 const createOneBlog = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
-  const files = req?.files;
+  // const files = req?.files;
 
-  const { title, category, content, metaTitle, metaDescription, tags } = data;
+  // const { title, category, content, metaTitle, metaDescription, tags } = data;
 
-  if (
-    !title ||
-    !category ||
-    !content ||
-    !metaTitle ||
-    !metaDescription ||
-    !tags
-  ) {
-    throw new CustomError(
-      400,
-      "These fields are required: title, category, content, metaTitle, metaDescription, tags"
-    );
-  }
+  // if (
+  //   !title ||
+  //   !category ||
+  //   !content ||
+  //   !metaTitle ||
+  //   !metaDescription ||
+  //   !tags
+  // ) {
+  //   throw new CustomError(
+  //     400,
+  //     "These fields are required: title, category, content, metaTitle, metaDescription, tags"
+  //   );
+  // }
 
-  //validate authority from middleware authentication
-  const userId = req?.auth?._id;
-  if (!userId) {
-    throw new CustomError(401, "Unauthorized user");
-  }
+  // const slug = await generateUniqueSlug(title, Blog);
 
-  let updatedData = {
-    author: userId,
-    title,
-    category,
-    content,
-    metaTitle,
-    metaDescription,
-    tags,
-  };
-  const folderName = "blogs";
-  if (files?.single) {
-    const fileUrls = await handleFileUpload({
-      req,
-      files: files?.single,
-      folderName,
+  // //validate authority from middleware authentication
+  // const userId = req?.auth?._id;
+  // if (!userId) {
+  //   throw new CustomError(401, "Unauthorized user");
+  // }
+
+  // let updatedData = {
+  //   author: userId,
+  //   title,
+  //   category,
+  //   content,
+  //   metaTitle,
+  //   metaDescription,
+  //   tags,
+  //   slug,
+  // };
+  // const folderName = "blogs";
+  // if (files?.single) {
+  //   const fileUrls = await handleFileUpload({
+  //     req,
+  //     files: files?.single,
+  //     folderName,
+  //   });
+  //   const featuredImage = fileUrls[0];
+  //   updatedData = { ...updatedData, featuredImage };
+  // }
+
+  // //perform query on database
+  // const blog = await Blog.createOneBlog(updatedData);
+  // return sendResponse(res, 201, "Blog created successfully", blog);
+
+  try {
+    // 1. Fetch only blogs that don't have a slug yet
+    const blogsToUpdate = await Blog.find({
+      $or: [
+        { slug: { $exists: false } },
+        { slug: null },
+        { slug: "" }
+      ]
     });
-    const featuredImage = fileUrls[0];
-    updatedData = { ...updatedData, featuredImage };
-  }
 
-  //perform query on database
-  const blog = await Blog.createOneBlog(updatedData);
-  return sendResponse(res, 201, "Blog created successfully", blog);
+    if (blogsToUpdate.length === 0) {
+      return sendResponse(res, 200, "No blogs found requiring slug migration.", { updated: 0 });
+    }
+
+    const updateResults = [];
+
+    // 2. Iterate and update
+    for (const blog of blogsToUpdate) {
+      // Call your existing helper function
+      const uniqueSlug = await generateUniqueSlug(blog.title, Blog);
+
+      // Update the document
+      const updatedBlog = await Blog.findByIdAndUpdate(
+        blog._id,
+        { $set: { slug: uniqueSlug } },
+        { new: true }
+      );
+
+      updateResults.push({
+        id: blog._id,
+        title: blog.title,
+        slug: uniqueSlug
+      });
+    }
+
+    return sendResponse(res, 200, `Successfully migrated ${updateResults.length} blogs.`, {
+      updatedCount: updateResults.length,
+      details: updateResults
+    });
+
+  } catch (error) {
+    errorLogger.error(`Migration Error: ${error.message}`);
+    throw new CustomError(500, "Internal Server Error during slug migration.");
+  }
 };
 
 //update a Blog using mongoose
@@ -181,6 +237,7 @@ module.exports = {
   getBlogsForLandingPage: asyncHandler(getBlogsForLandingPage),
   getOneBlog: asyncHandler(getOneBlog),
   getBlogByTitle: asyncHandler(getBlogByTitle),
+  getBlogBySlug: asyncHandler(getBlogBySlug),
   getMostRecentBlogs: asyncHandler(getMostRecentBlogs),
   getBlogsByCategory: asyncHandler(getBlogsByCategory),
   getFeaturedBlogs: asyncHandler(getFeaturedBlogs),

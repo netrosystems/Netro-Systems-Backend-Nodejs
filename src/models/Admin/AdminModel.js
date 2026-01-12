@@ -13,6 +13,7 @@ const {
   comparePasswords,
   CustomError,
   generateToken,
+  validateOTP,
 } = require("../../services");
 const {
   generateOTP,

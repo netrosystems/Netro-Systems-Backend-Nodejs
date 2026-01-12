@@ -16,6 +16,11 @@ const blogSchema = new mongoose.Schema({
     trim: true,
     maxlength: 150,
   },
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   category: {
     type: String,
     required: true,
@@ -140,6 +145,25 @@ blogSchema.statics.getBlogByTitle = async function (blogTitle) {
     // Find blog by title and populate the blogedBy field while excluding the password field
     const blog = await this.findOne({
       title: { $regex: new RegExp(`^${blogTitle}$`, "i") },
+    }).populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+
+    if (!blog) {
+      throw new CustomError(404, "Blog not found");
+    }
+
+    // Return blog
+    return blog;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+//get blog by slug (case insensitive)
+blogSchema.statics.getBlogBySlug = async function (blogSlug) {
+  try {
+    // Find blog by slug and populate the blogedBy field while excluding the password field
+    const blog = await this.findOne({
+      slug: blogSlug,
     }).populate("author", { fullName: 1, profileImage: 1, _id: 0 });
 
     if (!blog) {
