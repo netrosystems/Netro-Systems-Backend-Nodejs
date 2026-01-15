@@ -16,6 +16,7 @@ const initializeExpress = () => {
   // Initialize Express app
   const app = express();
 
+
   // Middleware for parsing URL-encoded bodies
   app.use(express.urlencoded({ extended: true }));
 
