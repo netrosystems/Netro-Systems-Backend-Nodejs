@@ -10,7 +10,9 @@ const {
   sendError,
   handleFileUpload,
   logger,
+  handleFileDelete,
 } = require("../../services");
+const { authorizeAdmin } = require("../../middlewares");
 
 // Default route
 DefaultRouter.get("/", (req, res) => {
@@ -53,6 +55,33 @@ DefaultRouter.use(
   "/uploads",
   express.static(path.join(__dirname, "../../../uploads"))
 );
+
+// Delete uploaded files by providing the file URL in the request body
+DefaultRouter.delete("/delete-file", authorizeAdmin, async (req, res) => {
+  try {
+    const { fileUrl } = req.query;
+
+    console.log("Delete fileUrl:", fileUrl);
+
+    if (!fileUrl || typeof fileUrl !== "string") {
+      return sendError(res, 400, "fileUrl query param is required");
+    }
+
+    const deleted = await handleFileDelete(fileUrl);
+
+    if (!deleted) {
+      return sendError(res, 404, "File not found or already deleted");
+    }
+
+    return sendResponse(res, 200, "File deleted successfully");
+  } catch (error) {
+    return sendError(
+      res,
+      500,
+      error?.message || "Internal server error"
+    );
+  }
+});
 
 //not found route
 DefaultRouter.use((req, res) => {

@@ -5,6 +5,8 @@ const {
   getBlogsForLandingPage,
   getOneBlog,
   getBlogByTitle,
+  getBlogBySlug,
+  increaseBlogViewCount,
   getMostRecentBlogs,
   getBlogsByCategory,
   getFeaturedBlogs,
@@ -19,6 +21,8 @@ BlogRouter.get("/all", getAllBlogs);
 BlogRouter.get("/landing", getBlogsForLandingPage);
 BlogRouter.get("/find/:id", getOneBlog);
 BlogRouter.get("/find-by-title/*", getBlogByTitle);
+BlogRouter.get("/find-by-slug/*", getBlogBySlug);
+BlogRouter.get("/increase-view-count/:id", increaseBlogViewCount);
 BlogRouter.get("/recent", getMostRecentBlogs);
 BlogRouter.get("/category/:category", getBlogsByCategory);
 BlogRouter.get("/featured", getFeaturedBlogs);

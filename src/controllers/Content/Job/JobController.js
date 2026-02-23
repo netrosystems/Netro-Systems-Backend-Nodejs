@@ -7,6 +7,7 @@ const {
   sendResponse,
   ObjectIdChecker,
   CustomError,
+  handleFileDelete,
 } = require("../../../services");
 
 //get all Job using mongoose
@@ -112,6 +113,11 @@ const updateOneJob = async (req, res) => {
     });
     const featuredImage = fileUrls[0];
     updatedData = { ...updatedData, featuredImage };
+
+    const existingJob = await Job.getOneJob(jobId);
+    if (existingJob?.featuredImage) {
+      await handleFileDelete(existingJob?.featuredImage);
+    }
   }
 
   //perform query on database
@@ -140,6 +146,11 @@ const deleteOneJob = async (req, res) => {
   //object id validation
   if (!ObjectIdChecker(jobId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingJob = await Job.getOneJob(jobId);
+  if (existingJob?.featuredImage) {
+    await handleFileDelete(existingJob?.featuredImage);
   }
 
   //perform query on database

@@ -7,6 +7,7 @@ const {
   ObjectIdChecker,
   CustomError,
   handleFileUpload,
+  handleFileDelete,
 } = require("../../../services");
 
 //get all Author using mongoose
@@ -46,7 +47,7 @@ const createOneAuthor = async (req, res) => {
     throw new CustomError(401, "Unauthorized user");
   }
 
-  const updatedData = {
+  let updatedData = {
     createdBy: userId,
     name,
     title,
@@ -87,7 +88,7 @@ const updateOneAuthor = async (req, res) => {
   }
 
   //prepare updated data
-  const updatedData = { name, title };
+  let updatedData = { name, title };
 
   const folderName = "authors";
   if (files?.single) {
@@ -98,6 +99,11 @@ const updateOneAuthor = async (req, res) => {
     });
     const image = fileUrls[0];
     updatedData = { ...updatedData, image };
+
+    const existingAuthor = await BlogAuthor.getOneAuthor(authorId);
+    if (existingAuthor?.image) {
+      await handleFileDelete(existingAuthor?.image);
+    }
   }
 
   //perform query on database
@@ -120,6 +126,11 @@ const deleteOneAuthor = async (req, res) => {
   //object id validation
   if (!ObjectIdChecker(authorId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingAuthor = await BlogAuthor.getOneAuthor(authorId);
+  if (existingAuthor?.image) {
+    await handleFileDelete(existingAuthor?.image);
   }
 
   //perform query on database

@@ -7,6 +7,7 @@ const {
   sendResponse,
   ObjectIdChecker,
   CustomError,
+  handleFileDelete,
 } = require("../../../services");
 
 //get all Blog using mongoose
@@ -46,6 +47,32 @@ const getBlogByTitle = async (req, res) => {
   return sendResponse(res, 200, "Blog retrieved successfully", blog);
 };
 
+// get blog by slug using mongoose
+const getBlogBySlug = async (req, res) => {
+  const slug = req.params[0];
+  const blogSlug = decodeURIComponent(slug);
+  //perform query on database
+  const blog = await Blog.getBlogBySlug(blogSlug);
+
+  //increase blog view count by 1
+  await Blog.increaseBlogViewCount(blog._id);
+
+  //return the blog
+  return sendResponse(res, 200, "Blog retrieved successfully", blog);
+};
+
+//increase blog view count by 1 using mongoose
+const increaseBlogViewCount = async (req, res) => {
+  const blogId = req?.params?.id;
+  //object id validation
+  if (!ObjectIdChecker(blogId)) {
+    return sendResponse(res, 400, "Invalid ObjectId");
+  }
+  //perform query on database
+  const blog = await Blog.increaseBlogViewCount(blogId);
+  return sendResponse(res, 200, "Blog view count increased successfully", blog);
+};
+
 //get 3 most recent Blog using mongoose
 const getMostRecentBlogs = async (req, res) => {
   //perform query on database
@@ -73,10 +100,13 @@ const createOneBlog = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
   const files = req?.files;
 
-  const { title, category, content, metaTitle, metaDescription, tags } = data;
+  const { title, slug, description, readingTime, category, content, metaTitle, metaDescription, tags } = data;
 
   if (
     !title ||
+    !slug ||
+    !description ||
+    !readingTime ||
     !category ||
     !content ||
     !metaTitle ||
@@ -85,7 +115,7 @@ const createOneBlog = async (req, res) => {
   ) {
     throw new CustomError(
       400,
-      "These fields are required: title, category, content, metaTitle, metaDescription, tags"
+      "These fields are required: title, slug, description, readingTime, category, content, metaTitle, metaDescription, tags"
     );
   }
 
@@ -103,6 +133,9 @@ const createOneBlog = async (req, res) => {
     metaTitle,
     metaDescription,
     tags,
+    slug,
+    description,
+    readingTime,
   };
   const folderName = "blogs";
   if (files?.single) {
@@ -141,6 +174,11 @@ const updateOneBlog = async (req, res) => {
     });
     const featuredImage = fileUrls[0];
     updatedData = { ...updatedData, featuredImage };
+
+    const existingBlog = await Blog.getOneBlog(blogId);
+    if (existingBlog?.featuredImage) {
+      await handleFileDelete(existingBlog?.featuredImage);
+    }
   }
 
   //perform query on database
@@ -171,6 +209,11 @@ const deleteOneBlog = async (req, res) => {
     return sendResponse(res, 400, "Invalid ObjectId");
   }
 
+  const existingBlog = await Blog.getOneBlog(blogId);
+  if (existingBlog?.featuredImage) {
+    await handleFileDelete(existingBlog?.featuredImage);
+  }
+
   //perform query on database
   const deletedBlog = await Blog.deleteOneBlog(blogId);
   return sendResponse(res, 200, "Blog deleted successfully", deletedBlog);
@@ -181,6 +224,8 @@ module.exports = {
   getBlogsForLandingPage: asyncHandler(getBlogsForLandingPage),
   getOneBlog: asyncHandler(getOneBlog),
   getBlogByTitle: asyncHandler(getBlogByTitle),
+  getBlogBySlug: asyncHandler(getBlogBySlug),
+  increaseBlogViewCount: asyncHandler(increaseBlogViewCount),
   getMostRecentBlogs: asyncHandler(getMostRecentBlogs),
   getBlogsByCategory: asyncHandler(getBlogsByCategory),
   getFeaturedBlogs: asyncHandler(getFeaturedBlogs),

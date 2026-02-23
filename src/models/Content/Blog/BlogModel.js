@@ -6,7 +6,7 @@ const { CustomError } = require("../../../services");
 const blogSchema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Admin",
+    ref: "BlogAuthor",
     default: null,
     required: true,
   },
@@ -51,6 +51,32 @@ const blogSchema = new mongoose.Schema({
     default: false,
     required: true,
   },
+
+  //new fields for blog
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+  },
+  description: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 300,
+  },
+  readingTime: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
+  totalViews: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
+
   publishedAt: {
     type: Number,
     default: () => Timekoto(),
@@ -80,7 +106,7 @@ blogSchema.statics.getAllBlogs = async function () {
     // Find all blogs and populate the blogedBy field while excluding the password field
     const blogs = await this.find()
       .sort({ createdAt: -1 })
-      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+      .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No blogs found");
@@ -100,7 +126,7 @@ blogSchema.statics.getBlogsForLandingPage = async function () {
     const blogs = await this.find()
       .sort({ createdAt: -1 })
       .limit(3)
-      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+      .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No featured blogs found");
@@ -118,8 +144,9 @@ blogSchema.statics.getOneBlog = async function (blogId) {
   try {
     // Find blog by id and populate the blogedBy field while excluding the password field
     const blog = await this.findById(blogId).populate("author", {
-      fullName: 1,
-      profileImage: 1,
+      name: 1,
+      image: 1,
+      title: 1,
       _id: 0,
     });
 
@@ -140,7 +167,50 @@ blogSchema.statics.getBlogByTitle = async function (blogTitle) {
     // Find blog by title and populate the blogedBy field while excluding the password field
     const blog = await this.findOne({
       title: { $regex: new RegExp(`^${blogTitle}$`, "i") },
-    }).populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+    }).populate("author", { name: 1, image: 1, title: 1, _id: 0 });
+
+    if (!blog) {
+      throw new CustomError(404, "Blog not found");
+    }
+
+    // Return blog
+    return blog;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+//get blog by slug
+blogSchema.statics.getBlogBySlug = async function (blogSlug) {
+  try {
+    // Find blog by slug and populate the blogedBy field while excluding the password field
+    const blog = await this.findOne({ slug: blogSlug }).populate("author", {
+      name: 1,
+      image: 1,
+      title: 1,
+      _id: 0,
+    });
+
+    if (!blog) {
+      throw new CustomError(404, "Blog not found");
+    }
+
+    // Return blog
+    return blog;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+// Define a static method to increase blog view count by 1
+blogSchema.statics.increaseBlogViewCount = async function (blogId) {
+  try {
+    // Find blog by id and update
+    const blog = await this.findByIdAndUpdate(
+      blogId,
+      { $inc: { totalViews: 1 } },
+      { new: true, runValidators: true }
+    );
 
     if (!blog) {
       throw new CustomError(404, "Blog not found");
@@ -160,7 +230,7 @@ blogSchema.statics.getMostRecentBlogs = async function () {
     const blogs = await this.find()
       .sort({ createdAt: -1 })
       .limit(3)
-      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+      .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No blogs found");
@@ -179,7 +249,7 @@ blogSchema.statics.getBlogsByCategory = async function (blogCategory) {
     // Find blogs by category and populate the blogedBy field while excluding the password field
     const blogs = await this.find({ category: blogCategory })
       .sort({ createdAt: -1 })
-      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+      .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No blogs found");
@@ -198,7 +268,7 @@ blogSchema.statics.getFeaturedBlogs = async function () {
     // Find featured blogs and populate the blogedBy field while excluding the password field
     const blogs = await this.find({ isFeatured: true })
       .sort({ createdAt: -1 })
-      .populate("author", { fullName: 1, profileImage: 1, _id: 0 });
+      .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No featured blogs found");
@@ -227,8 +297,9 @@ blogSchema.statics.createOneBlog = async function (blogData) {
     const blog = await this.create(blogData);
 
     await blog.populate("author", {
-      fullName: 1,
-      profileImage: 1,
+      name: 1,
+      image: 1,
+      title: 1,
       _id: 0,
     });
 
@@ -253,8 +324,9 @@ blogSchema.statics.updateOneBlog = async function ({ blogId, updatedData }) {
     }
 
     await blog.populate("author", {
-      fullName: 1,
-      profileImage: 1,
+      name: 1,
+      image: 1,
+      title: 1,
       _id: 0,
     });
 
