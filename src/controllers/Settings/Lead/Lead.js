@@ -32,15 +32,17 @@ const getOneLead = async (req, res) => {
 const createOneLead = async (req, res) => {
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
 
-  const { email, message } = data;
+  const { name, email, message, budget } = data;
 
   if (!email) {
     throw new CustomError(400, "These fields are required: email");
   }
 
   const updatedData = {
+    name,
     email,
     message,
+    budget,
   };
 
   //perform query on database
