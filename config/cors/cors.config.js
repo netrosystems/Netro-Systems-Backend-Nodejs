@@ -14,6 +14,7 @@ const allowedOrigins = [
   //for deployment
   "https://netrosystems.netlify.com",
   "https://netrosystems.vercel.app",
+  "https://www.netrosystems.com",
   "https://netrosystems.com",
   "https://sadmin.netrosystems.com",
 ];

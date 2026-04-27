@@ -7,6 +7,7 @@ const {
   sendResponse,
   ObjectIdChecker,
   CustomError,
+  handleFileDelete,
 } = require("../../../services");
 
 //get all Service using mongoose
@@ -113,6 +114,11 @@ const updateOneService = async (req, res) => {
     });
     const featuredImage = fileUrls[0];
     updatedData = { ...updatedData, featuredImage };
+
+    const existingService = await Service.getOneService(serviceId);
+    if (existingService?.featuredImage) {
+      await handleFileDelete(existingService?.featuredImage);
+    }
   }
 
   //perform query on database
@@ -130,6 +136,11 @@ const deleteOneService = async (req, res) => {
   //object id validation
   if (!ObjectIdChecker(serviceId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingService = await Service.getOneService(serviceId);
+  if (existingService?.featuredImage) {
+    await handleFileDelete(existingService?.featuredImage);
   }
 
   //perform query on database
