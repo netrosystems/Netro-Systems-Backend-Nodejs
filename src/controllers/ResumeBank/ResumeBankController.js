@@ -7,6 +7,7 @@ const {
   sendResponse,
   ObjectIdChecker,
   CustomError,
+  handleFileDelete,
 } = require("../../services");
 
 //get all Resume using mongoose
@@ -141,6 +142,11 @@ const updateOneResume = async (req, res) => {
     });
     const resumeUrl = fileUrls[0];
     updatedData = { ...updatedData, resumeUrl };
+
+    const existingResume = await Resume.getOneResume(resumeId);
+    if (existingResume?.resumeUrl) {
+      await handleFileDelete(existingResume?.resumeUrl);
+    }
   }
 
   //perform query on database
@@ -158,6 +164,11 @@ const deleteOneResume = async (req, res) => {
   //object id validation
   if (!ObjectIdChecker(resumeId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingResume = await Resume.getOneResume(resumeId);
+  if (existingResume?.resumeUrl) {
+    await handleFileDelete(existingResume?.resumeUrl);
   }
 
   //perform query on database
