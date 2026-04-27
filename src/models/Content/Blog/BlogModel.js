@@ -16,11 +16,11 @@ const blogSchema = new mongoose.Schema({
     trim: true,
     maxlength: 150,
   },
-  slug: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+  // slug: {
+  //   type: String,
+  //   required: true,
+  //   unique: true,
+  // },
   category: {
     type: String,
     required: true,
