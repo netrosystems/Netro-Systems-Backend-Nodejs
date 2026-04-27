@@ -4,6 +4,12 @@ const { Timekoto } = require("timekoto");
 const { CustomError } = require("../../../services");
 
 const leadSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    default: "",
+    trim: true,
+    maxlength: 100,
+  },
   email: {
     type: String,
     required: true,
@@ -13,6 +19,11 @@ const leadSchema = new mongoose.Schema({
   message: {
     type: String,
     default: "",
+  },
+  budget: {
+    type: String,
+    default: "",
+    maxlength: 150,
   },
   createdAt: {
     type: Number,

@@ -7,6 +7,7 @@ const {
   sendResponse,
   ObjectIdChecker,
   CustomError,
+  handleFileDelete,
 } = require("../../../services");
 
 //get all Team using mongoose
@@ -93,6 +94,11 @@ const updateOneTeam = async (req, res) => {
     });
     const image = fileUrls[0];
     updatedData = { ...updatedData, image };
+
+    const existingTeam = await Team.getOneTeam(teamId);
+    if (existingTeam?.image) {
+      await handleFileDelete(existingTeam?.image);
+    }
   }
 
   //perform query on database
@@ -112,6 +118,11 @@ const deleteOneTeam = async (req, res) => {
   //object id validation
   if (!ObjectIdChecker(teamId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingTeam = await Team.getOneTeam(teamId);
+  if (existingTeam?.image) {
+    await handleFileDelete(existingTeam?.image);
   }
 
   //perform query on database

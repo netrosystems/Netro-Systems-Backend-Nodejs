@@ -4,6 +4,7 @@ const Admin = require("./Admin/AdminModel");
 const OTP = require("./Otp/OtpModel");
 const Blog = require("./Content/Blog/BlogModel");
 const BlogCategory = require("./Content/Blog/BlogCategoryModel");
+const BlogAuthor = require("./Content/Blog/BlogAuthorModel");
 const Service = require("./Content/Service/ServiceModel");
 const Portfolio = require("./Content/Portfolio/PortfolioModel");
 const PortfolioCategory = require("./Content/Portfolio/PortfolioCategoryModel");
@@ -19,6 +20,7 @@ module.exports = {
   OTP,
   Blog,
   BlogCategory,
+  BlogAuthor,
   Service,
   Portfolio,
   PortfolioCategory,
