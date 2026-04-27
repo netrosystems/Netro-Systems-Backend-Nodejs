@@ -7,6 +7,7 @@ const {
   sendResponse,
   ObjectIdChecker,
   CustomError,
+  handleFileDelete,
 } = require("../../services");
 
 //get all Testimonial using mongoose
@@ -112,6 +113,11 @@ const updateOneTestimonial = async (req, res) => {
     });
     const imageUrl = fileUrls[0];
     updatedData = { ...updatedData, imageUrl };
+
+    const existingTestimonial = await Testimonial.getOneTestimonial(testimonialId);
+    if (existingTestimonial?.imageUrl) {
+      await handleFileDelete(existingTestimonial?.imageUrl);
+    }
   }
 
   //perform query on database
@@ -134,6 +140,11 @@ const deleteOneTestimonial = async (req, res) => {
   //object id validation
   if (!ObjectIdChecker(testimonialId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingTestimonial = await Testimonial.getOneTestimonial(testimonialId);
+  if (existingTestimonial?.imageUrl) {
+    await handleFileDelete(existingTestimonial?.imageUrl);
   }
 
   //perform query on database

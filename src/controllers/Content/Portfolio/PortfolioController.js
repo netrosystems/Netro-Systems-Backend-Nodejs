@@ -7,6 +7,7 @@ const {
   sendResponse,
   ObjectIdChecker,
   CustomError,
+  handleFileDelete,
 } = require("../../../services");
 
 //get all Portfolio using mongoose
@@ -189,6 +190,11 @@ const updateOnePortfolio = async (req, res) => {
     });
     const featuredImage = fileUrls[0];
     updatedData = { ...updatedData, featuredImage };
+
+    const existingPortfolio = await Portfolio.getOnePortfolio(portfolioId);
+    if (existingPortfolio?.featuredImage) {
+      await handleFileDelete(existingPortfolio?.featuredImage);
+    }
   }
 
   //upload projectImages
@@ -222,6 +228,11 @@ const deleteOnePortfolio = async (req, res) => {
   //object id validation
   if (!ObjectIdChecker(portfolioId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingPortfolio = await Portfolio.getOnePortfolio(portfolioId);
+  if (existingPortfolio?.featuredImage) {
+    await handleFileDelete(existingPortfolio?.featuredImage);
   }
 
   //perform query on database

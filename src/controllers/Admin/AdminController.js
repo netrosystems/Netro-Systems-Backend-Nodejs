@@ -10,6 +10,7 @@ const {
   sendResponse,
   logger,
   hashPassword,
+  handleFileDelete,
 } = require("../../services");
 
 // Login Admin using mongoose
@@ -101,6 +102,11 @@ const updateAdminById = async (req, res) => {
     });
     const profileImage = fileUrls[0];
     updatedData = { ...updatedData, profileImage };
+
+    const existingAdmin = await Admin.getOneAdmin({ id });
+    if (existingAdmin?.profileImage) {
+      await handleFileDelete(existingAdmin?.profileImage);
+    }
   }
 
   if (password) {
@@ -115,7 +121,9 @@ const updateAdminById = async (req, res) => {
   logger.log("info", JSON.stringify(updatedData, null, 2));
 
   const updatedAdmin = await Admin.updateAdminById({ id, updatedData });
+
   logger.log("info", "Admin updated successfully");
+
   return sendResponse(res, 200, "Admin updated successfully", updatedAdmin);
 };
 
@@ -203,6 +211,11 @@ const deleteAdminById = async (req, res) => {
 
   if (!ObjectIdChecker(id)) {
     return sendResponse(res, 400, "Invalid ObjectId");
+  }
+
+  const existingAdmin = await Admin.getOneAdmin(id);
+  if (existingAdmin?.profileImage) {
+    await handleFileDelete(existingAdmin?.profileImage);
   }
 
   const deletionResult = await Admin.deleteAdminById(id);
