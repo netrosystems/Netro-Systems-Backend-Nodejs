@@ -98,24 +98,8 @@ const getFeaturedBlogs = async (req, res) => {
 
 // Create a new Blog
 const createOneBlog = async (req, res) => {
+
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
-  // const files = req?.files;
-
-  // const { title, category, content, metaTitle, metaDescription, tags } = data;
-
-  // if (
-  //   !title ||
-  //   !category ||
-  //   !content ||
-  //   !metaTitle ||
-  //   !metaDescription ||
-  //   !tags
-  // ) {
-  //   throw new CustomError(
-  //     400,
-  //     "These fields are required: title, category, content, metaTitle, metaDescription, tags"
-  //   );
-  // }
   const { title, slug, description, readingTime, category, content, metaTitle, metaDescription, tags } = data;
 
   if (
@@ -152,12 +136,17 @@ const createOneBlog = async (req, res) => {
     metaDescription,
     tags,
     slug,
+    description,
+    readingTime,
   };
+
   const folderName = "blogs";
-  if (files?.single) {
+  const incomingFiles = req?.files?.single || req?.files;
+
+  if (incomingFiles) {
     const fileUrls = await handleFileUpload({
       req,
-      files: files?.single,
+      files: Array.isArray(incomingFiles) ? incomingFiles : [incomingFiles],
       folderName,
     });
     const featuredImage = fileUrls[0];
@@ -182,10 +171,12 @@ const updateOneBlog = async (req, res) => {
 
   let updatedData = data ? data : {};
   const folderName = "blogs";
-  if (files?.single) {
+  const incomingFiles = req?.files?.single || req?.files;
+
+  if (incomingFiles) {
     const fileUrls = await handleFileUpload({
       req,
-      files: files?.single,
+      files: Array.isArray(incomingFiles) ? incomingFiles : [incomingFiles],
       folderName,
     });
     const featuredImage = fileUrls[0];
