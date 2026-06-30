@@ -1,15 +1,8 @@
 // controllers/Content/Blog/BlogController.js
-
-const { asyncHandler } = require("../../../middlewares");
 const { Blog } = require("../../../models");
-const {
-  handleFileUpload,
-  sendResponse,
-  ObjectIdChecker,
-  CustomError,
-  handleFileDelete,
-} = require("../../../services");
+const { asyncHandler } = require("../../../middlewares");
 const { generateUniqueSlug } = require("../../../services/slugHandlers/HandleSlug");
+const { handleFileUpload, sendResponse, ObjectIdChecker, CustomError, handleFileDelete, } = require("../../../services");
 
 //get all Blog using mongoose
 const getAllBlogs = async (req, res) => {
@@ -105,24 +98,8 @@ const getFeaturedBlogs = async (req, res) => {
 
 // Create a new Blog
 const createOneBlog = async (req, res) => {
+
   const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
-  // const files = req?.files;
-
-  // const { title, category, content, metaTitle, metaDescription, tags } = data;
-
-  // if (
-  //   !title ||
-  //   !category ||
-  //   !content ||
-  //   !metaTitle ||
-  //   !metaDescription ||
-  //   !tags
-  // ) {
-  //   throw new CustomError(
-  //     400,
-  //     "These fields are required: title, category, content, metaTitle, metaDescription, tags"
-  //   );
-  // }
   const { title, slug, description, readingTime, category, content, metaTitle, metaDescription, tags } = data;
 
   if (
@@ -144,101 +121,41 @@ const createOneBlog = async (req, res) => {
 
   // const slug = await generateUniqueSlug(title, Blog);
 
-  // //validate authority from middleware authentication
-  // const userId = req?.auth?._id;
-  // if (!userId) {
-  //   throw new CustomError(401, "Unauthorized user");
-  // }
-
-  // let updatedData = {
-  //   author: userId,
-  //   title,
-  //   category,
-  //   content,
-  //   metaTitle,
-  //   metaDescription,
-  //   tags,
-  //   slug,
-  // };
-  // const folderName = "blogs";
-  // if (files?.single) {
-  //   const fileUrls = await handleFileUpload({
-  //     req,
-  //     files: files?.single,
-  //     folderName,
-  //   });
-  //   const featuredImage = fileUrls[0];
-  //   updatedData = { ...updatedData, featuredImage };
-  // }
-
-  // //perform query on database
-  // const blog = await Blog.createOneBlog(updatedData);
-  // return sendResponse(res, 201, "Blog created successfully", blog);
-
-  try {
-    // 1. Fetch only blogs that don't have a slug yet
-    const blogsToUpdate = await Blog.find({
-      $or: [
-        { slug: { $exists: false } },
-        { slug: null },
-        { slug: "" }
-      ]
-    });
-
-    let updatedData = {
-      author: userId,
-      title,
-      category,
-      content,
-      metaTitle,
-      metaDescription,
-      tags,
-      slug,
-      description,
-      readingTime,
-    };
-    const folderName = "blogs";
-    if (files?.single) {
-      const fileUrls = await handleFileUpload({
-        req,
-        files: files?.single,
-        folderName,
-      });
-    }
-
-    if (blogsToUpdate.length === 0) {
-      return sendResponse(res, 200, "No blogs found requiring slug migration.", { updated: 0 });
-    }
-
-    const updateResults = [];
-
-    // 2. Iterate and update
-    for (const blog of blogsToUpdate) {
-      // Call your existing helper function
-      const uniqueSlug = await generateUniqueSlug(blog.title, Blog);
-
-      // Update the document
-      const updatedBlog = await Blog.findByIdAndUpdate(
-        blog._id,
-        { $set: { slug: uniqueSlug } },
-        { new: true }
-      );
-
-      updateResults.push({
-        id: blog._id,
-        title: blog.title,
-        slug: uniqueSlug
-      });
-    }
-
-    return sendResponse(res, 200, `Successfully migrated ${updateResults.length} blogs.`, {
-      updatedCount: updateResults.length,
-      details: updateResults
-    });
-  } catch (error) {
-    errorLogger.error(`Migration Error: ${error.message}`);
-    throw new CustomError(500, "Internal Server Error during slug migration.");
+  //validate authority from middleware authentication
+  const userId = req?.auth?._id;
+  if (!userId) {
+    throw new CustomError(401, "Unauthorized user");
   }
+
+  let updatedData = {
+    author: userId,
+    title,
+    category,
+    content,
+    metaTitle,
+    metaDescription,
+    tags,
+    slug,
+    description,
+    readingTime,
+  };
+
+  const folderName = "blogs";
+  const incomingFiles = req?.files?.single || req?.files;
+
+  if (incomingFiles) {
+    const fileUrls = await handleFileUpload({
+      req,
+      files: Array.isArray(incomingFiles) ? incomingFiles : [incomingFiles],
+      folderName,
+    });
+    const featuredImage = fileUrls[0];
+    updatedData = { ...updatedData, featuredImage };
+  }
+
+  //perform query on database
+  const blog = await Blog.createOneBlog(updatedData);
+  return sendResponse(res, 201, "Blog created successfully", blog);
 };
 
 //update a Blog using mongoose
@@ -254,10 +171,12 @@ const updateOneBlog = async (req, res) => {
 
   let updatedData = data ? data : {};
   const folderName = "blogs";
-  if (files?.single) {
+  const incomingFiles = req?.files?.single || req?.files;
+
+  if (incomingFiles) {
     const fileUrls = await handleFileUpload({
       req,
-      files: files?.single,
+      files: Array.isArray(incomingFiles) ? incomingFiles : [incomingFiles],
       folderName,
     });
     const featuredImage = fileUrls[0];
