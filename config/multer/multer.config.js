@@ -19,7 +19,13 @@ const initializeMulter = (app) => {
     },
   });
 
-  const upload = multer({ storage: storage });
+  const upload = multer({
+    storage: storage,
+    limits: {
+      fieldSize: 50 * 1024 * 1024, // 50MB max field size for non-file text data (e.g. rich text JSON)
+      fileSize: 50 * 1024 * 1024, // 50MB max file size
+    },
+  });
 
   // For handling a single file
   //   app.use(upload.single("file"));
@@ -47,10 +53,8 @@ const initializeMulter = (app) => {
   // Custom Multer error handler middleware
   app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {
-      // res.status(400).json({ error: "File upload error: " + err?.message });
-
-      //sending response through custom response helper
-      return sendResponse(res, 500, err?.message);
+      // sending response through custom response helper
+      return sendResponse(res, 400, `File upload error: ${err?.message}`);
     } else {
       next(err);
     }

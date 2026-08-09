@@ -96,22 +96,42 @@ const getFeaturedBlogs = async (req, res) => {
   return sendResponse(res, 200, "Fetched featured blogs", blogs);
 };
 
+// Helper to safely parse incoming request data
+const parseRequestData = (req) => {
+  if (!req?.body) return {};
+  if (req.body.data) {
+    if (typeof req.body.data === "string") {
+      try {
+        return JSON.parse(req.body.data);
+      } catch (e) {
+        throw new CustomError(400, "Invalid JSON format in data field");
+      }
+    }
+    if (typeof req.body.data === "object") {
+      return req.body.data;
+    }
+  }
+  return req.body;
+};
+
 // Create a new Blog
 const createOneBlog = async (req, res) => {
-
-  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
-  const { title, slug, description, readingTime, category, content, metaTitle, metaDescription, tags } = data;
+  const data = parseRequestData(req);
+  const { title, slug, description, readingTime, category, content, metaTitle, metaDescription, tags, author } = data;
 
   if (
     !title ||
     !slug ||
     !description ||
-    !readingTime ||
+    readingTime === undefined ||
+    readingTime === null ||
     !category ||
     !content ||
     !metaTitle ||
     !metaDescription ||
-    !tags
+    !tags ||
+    !Array.isArray(tags) ||
+    tags.length === 0
   ) {
     throw new CustomError(
       400,
@@ -119,25 +139,26 @@ const createOneBlog = async (req, res) => {
     );
   }
 
-  // const slug = await generateUniqueSlug(title, Blog);
-
-  //validate authority from middleware authentication
+  // Determine author ID: prefer selected author from frontend if valid, fallback to logged in Admin user ID
   const userId = req?.auth?._id;
-  if (!userId) {
-    throw new CustomError(401, "Unauthorized user");
+  let authorId = userId;
+  if (author && ObjectIdChecker(author)) {
+    authorId = author;
+  } else if (!userId) {
+    throw new CustomError(401, "Unauthorized user or missing author");
   }
 
   let updatedData = {
-    author: userId,
+    author: authorId,
     title,
     category,
     content,
     metaTitle,
     metaDescription,
     tags,
-    slug,
+    slug: slug.trim().toLowerCase(),
     description,
-    readingTime,
+    readingTime: Number(readingTime),
   };
 
   const folderName = "blogs";
@@ -149,8 +170,16 @@ const createOneBlog = async (req, res) => {
       files: Array.isArray(incomingFiles) ? incomingFiles : [incomingFiles],
       folderName,
     });
-    const featuredImage = fileUrls[0];
-    updatedData = { ...updatedData, featuredImage };
+    if (fileUrls && fileUrls.length > 0) {
+      const featuredImage = fileUrls[0];
+      updatedData = { ...updatedData, featuredImage };
+    }
+  }
+
+  // Check if slug already exists to prevent E11000 duplicate key error
+  const existingSlug = await Blog.findOne({ slug: updatedData.slug });
+  if (existingSlug) {
+    throw new CustomError(400, `A blog with the slug "${slug}" already exists.`);
   }
 
   //perform query on database
@@ -161,15 +190,25 @@ const createOneBlog = async (req, res) => {
 //update a Blog using mongoose
 const updateOneBlog = async (req, res) => {
   const blogId = req?.params?.id;
-  const files = req?.files;
-  const data = req?.body?.data ? JSON.parse(req?.body?.data) : {};
 
   //object id validation
   if (!ObjectIdChecker(blogId)) {
     return sendResponse(res, 400, "Invalid ObjectId");
   }
 
-  let updatedData = data ? data : {};
+  const data = parseRequestData(req);
+  let updatedData = data ? { ...data } : {};
+
+  if (data?.author && ObjectIdChecker(data.author)) {
+    updatedData.author = data.author;
+  }
+  if (data?.readingTime !== undefined) {
+    updatedData.readingTime = Number(data.readingTime);
+  }
+  if (data?.slug) {
+    updatedData.slug = data.slug.trim().toLowerCase();
+  }
+
   const folderName = "blogs";
   const incomingFiles = req?.files?.single || req?.files;
 
@@ -179,12 +218,18 @@ const updateOneBlog = async (req, res) => {
       files: Array.isArray(incomingFiles) ? incomingFiles : [incomingFiles],
       folderName,
     });
-    const featuredImage = fileUrls[0];
-    updatedData = { ...updatedData, featuredImage };
+    if (fileUrls && fileUrls.length > 0) {
+      const featuredImage = fileUrls[0];
+      updatedData = { ...updatedData, featuredImage };
 
-    const existingBlog = await Blog.getOneBlog(blogId);
-    if (existingBlog?.featuredImage) {
-      await handleFileDelete(existingBlog?.featuredImage);
+      try {
+        const existingBlog = await Blog.getOneBlog(blogId);
+        if (existingBlog?.featuredImage) {
+          await handleFileDelete(existingBlog?.featuredImage);
+        }
+      } catch (err) {
+        console.error("Error cleaning up old blog featured image:", err);
+      }
     }
   }
 

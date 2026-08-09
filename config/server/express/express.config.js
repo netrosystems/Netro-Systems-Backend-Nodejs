@@ -17,8 +17,9 @@ const initializeExpress = () => {
   const app = express();
 
 
-  // Middleware for parsing URL-encoded bodies
-  app.use(express.urlencoded({ extended: true }));
+  // Middleware for parsing JSON and URL-encoded bodies with 50mb limits
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
   // Middleware to collect request duration
   app.use(initializeMonitoring);

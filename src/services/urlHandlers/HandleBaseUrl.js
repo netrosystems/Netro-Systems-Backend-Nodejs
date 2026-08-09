@@ -7,8 +7,11 @@
  */
 
 const getServerBaseUrl = (req) => {
-  // Construct the server base URL
-  const serverBaseUrl = `https://${req.get("host")}`;
+  // Construct the server base URL using request protocol or fallback to http
+  const rawProto = req.get("x-forwarded-proto") || req.protocol || "http";
+  const protocol = rawProto.split(",")[0].trim();
+  const host = req.get("host") || "localhost:5000";
+  const serverBaseUrl = `${protocol}://${host}`;
   return serverBaseUrl;
 };
 
