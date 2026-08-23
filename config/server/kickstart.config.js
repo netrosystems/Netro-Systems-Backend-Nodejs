@@ -1,6 +1,6 @@
 // config/server/kickstart.config.js
 
-const { logger } = require("../../src/services");
+const { logger, startScheduledBlogPublisher } = require("../../src/services");
 const { connectToDatabase } = require("../../config");
 const { initializeExpress } = require("./express/express.config");
 const port = process.env.SERVER_PORT || 5005;
@@ -17,6 +17,7 @@ async function kickstartServer() {
     // Start the http server
     expressApp.listen(port, () => {
       logger.log("info", `Server is running on port: ${port}`);
+      startScheduledBlogPublisher();
     });
   } catch (error) {
     // Log the error and exit the process

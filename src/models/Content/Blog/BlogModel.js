@@ -16,11 +16,13 @@ const blogSchema = new mongoose.Schema({
     trim: true,
     maxlength: 150,
   },
-  // slug: {
-  //   type: String,
-  //   required: true,
-  //   unique: true,
-  // },
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+  },
   category: {
     type: String,
     required: true,
@@ -29,10 +31,37 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  description: {
+    type: String,
+    default: "",
+    trim: true,
+    maxlength: 300,
+  },
+  excerpt: {
+    type: String,
+    default: "",
+    trim: true,
+    maxlength: 300,
+  },
+  readingTime: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
+  totalViews: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
   featuredImage: {
     type: String,
     default: "https://via.placeholder.com/150",
     required: true,
+  },
+  featuredImageAlt: {
+    type: String,
+    default: "",
+    maxlength: 180,
   },
   isFeatured: {
     type: Boolean,
@@ -56,36 +85,18 @@ const blogSchema = new mongoose.Schema({
     default: false,
     required: true,
   },
-
-  //new fields for blog
-  slug: {
+  publishStatus: {
     type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
+    enum: ["draft", "published", "scheduled"],
+    default: "published",
   },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 300,
-  },
-  readingTime: {
+  scheduledAt: {
     type: Number,
-    default: 0,
-    required: true,
+    default: null,
   },
-  totalViews: {
-    type: Number,
-    default: 0,
-    required: true,
-  },
-
   publishedAt: {
     type: Number,
-    default: () => Timekoto(),
-    required: true,
+    default: null,
   },
   createdAt: {
     type: Number,
@@ -99,45 +110,251 @@ const blogSchema = new mongoose.Schema({
   },
 });
 
-// Middleware to update `updatedAt` on every save
+// Middleware to update `updatedAt` and sync description/excerpt on save
 blogSchema.pre("save", function (next) {
-  this.updatedAt = () => Timekoto();
+  this.updatedAt = Timekoto();
+  if (this.excerpt && !this.description) {
+    this.description = this.excerpt;
+  } else if (this.description && !this.excerpt) {
+    this.excerpt = this.description;
+  }
   next();
 });
 
-// Define a static method to get all blogs
-blogSchema.statics.getAllBlogs = async function () {
+const liveBlogFilter = () => {
+  const now = Timekoto();
+  return {
+    $or: [
+      { publishStatus: "published", published: { $ne: false } },
+      {
+        publishStatus: "scheduled",
+        published: { $ne: false },
+        scheduledAt: { $lte: now },
+      },
+      {
+        publishStatus: { $exists: false },
+        published: { $ne: false },
+      },
+    ],
+  };
+};
+
+const escapeRegex = (value = "") => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const buildPublicBlogQuery = ({ search, category, tag } = {}) => {
+  const query = liveBlogFilter();
+
+  if (category) {
+    query.category = category;
+  }
+
+  if (tag) {
+    query.tags = tag;
+  }
+
+  if (search) {
+    const searchRegex = new RegExp(escapeRegex(search), "i");
+    query.$and = [
+      {
+        $or: [
+          { title: searchRegex },
+          { category: searchRegex },
+          { tags: searchRegex },
+          { metaDescription: searchRegex },
+          { description: searchRegex },
+          { excerpt: searchRegex },
+        ],
+      },
+    ];
+  }
+
+  return query;
+};
+
+blogSchema.statics.activateDueScheduledBlogs = async function () {
+  const now = Timekoto();
+
+  const result = await this.updateMany(
+    {
+      publishStatus: "scheduled",
+      scheduledAt: { $lte: now },
+    },
+    {
+      $set: {
+        publishStatus: "published",
+        published: true,
+        scheduledAt: null,
+        publishedAt: now,
+        updatedAt: now,
+      },
+    }
+  );
+
+  return result?.modifiedCount || 0;
+};
+
+blogSchema.index({ publishStatus: 1, published: 1, scheduledAt: 1, publishedAt: -1 });
+blogSchema.index({ category: 1, publishStatus: 1, published: 1, publishedAt: -1 });
+blogSchema.index({ isFeatured: 1, publishStatus: 1, published: 1, publishedAt: -1 });
+
+// Define a static method to get all blogs (public with pagination and search)
+blogSchema.statics.getAllBlogs = async function (queryParams = {}) {
   try {
-    // Find all blogs and populate the blogedBy field while excluding the password field
-    const blogs = await this.find()
-      .sort({ createdAt: -1 })
-      .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
+    await this.activateDueScheduledBlogs();
+    const page = Math.max(parseInt(queryParams.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(queryParams.limit, 10) || 100, 1), 100);
+    const skip = (page - 1) * limit;
+    const query = buildPublicBlogQuery(queryParams);
+
+    const blogs = await this.find(query)
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
+    const total = await this.find(query).countDocuments();
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No blogs found");
     }
 
-    // Return blogs
+    return { data: blogs, total, page, limit, totalPages: Math.ceil(total / limit) };
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+// Define a static method to get all blogs for admin
+blogSchema.statics.getAllBlogsForAdmin = async function () {
+  try {
+    await this.activateDueScheduledBlogs();
+    const blogs = await this.find()
+      .sort({ createdAt: -1 })
+      .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No blogs found");
+    }
+
     return blogs;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-//get blogs for landing page (3 random featured blog)
+blogSchema.statics.getPublishedBlogsForAdmin = async function () {
+  try {
+    await this.activateDueScheduledBlogs();
+    const now = Timekoto();
+    const blogs = await this.find({
+      $or: [
+        { publishStatus: "published", published: true },
+        {
+          publishStatus: "scheduled",
+          published: true,
+          scheduledAt: { $lte: now },
+        },
+        { publishStatus: { $exists: false } },
+      ],
+    })
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No published blogs found");
+    }
+
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+blogSchema.statics.getScheduledBlogs = async function () {
+  try {
+    await this.activateDueScheduledBlogs();
+    const now = Timekoto();
+    const blogs = await this.find({
+      publishStatus: "scheduled",
+      published: true,
+      scheduledAt: { $gt: now },
+    })
+      .sort({ scheduledAt: 1 })
+      .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No scheduled blogs found");
+    }
+
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+blogSchema.statics.getDraftBlogs = async function () {
+  try {
+    const blogs = await this.find({ publishStatus: "draft" })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
+
+    if (blogs?.length === 0) {
+      throw new CustomError(404, "No draft blogs found");
+    }
+
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+blogSchema.statics.getRelatedBlogs = async function (blogSlug, limit = 5) {
+  try {
+    await this.activateDueScheduledBlogs();
+    const currentBlog = await this.findOne({ slug: blogSlug });
+    if (!currentBlog) {
+      throw new CustomError(404, "Blog not found");
+    }
+
+    const blogs = await this.find({
+      ...liveBlogFilter(),
+      _id: { $ne: currentBlog._id },
+      $or: [
+        { category: currentBlog.category },
+        { tags: { $in: currentBlog.tags || [] } },
+      ],
+    })
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .limit(limit)
+      .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
+
+    return blogs;
+  } catch (error) {
+    throw new CustomError(error?.statusCode, error?.message);
+  }
+};
+
+// get blogs for landing page (3 most recent featured live blogs)
 blogSchema.statics.getBlogsForLandingPage = async function () {
   try {
-    // Find featured blogs and populate the blogedBy field while excluding the password field random 3
-    const blogs = await this.find()
-      .sort({ createdAt: -1 })
+    await this.activateDueScheduledBlogs();
+    const blogs = await this.find({ ...liveBlogFilter(), isFeatured: true })
+      .sort({ publishedAt: -1, createdAt: -1 })
       .limit(3)
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
-      throw new CustomError(404, "No featured blogs found");
+      // Fallback to 3 most recent live blogs if none featured
+      const fallbackBlogs = await this.find(liveBlogFilter())
+        .sort({ publishedAt: -1, createdAt: -1 })
+        .limit(3)
+        .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
+
+      if (fallbackBlogs?.length === 0) {
+        throw new CustomError(404, "No blogs found");
+      }
+      return fallbackBlogs;
     }
 
-    // Return blogs
     return blogs;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -147,7 +364,7 @@ blogSchema.statics.getBlogsForLandingPage = async function () {
 // Define a static method to get one blog by id
 blogSchema.statics.getOneBlog = async function (blogId) {
   try {
-    // Find blog by id and populate the blogedBy field while excluding the password field
+    await this.activateDueScheduledBlogs();
     const blog = await this.findById(blogId).populate("author", {
       name: 1,
       image: 1,
@@ -159,18 +376,18 @@ blogSchema.statics.getOneBlog = async function (blogId) {
       throw new CustomError(404, "Blog not found");
     }
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-//get blog by title (case insensitive)
+// get blog by title (case insensitive)
 blogSchema.statics.getBlogByTitle = async function (blogTitle) {
   try {
-    // Find blog by title and populate the blogedBy field while excluding the password field
+    await this.activateDueScheduledBlogs();
     const blog = await this.findOne({
+      ...liveBlogFilter(),
       title: { $regex: new RegExp(`^${blogTitle}$`, "i") },
     }).populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
@@ -178,18 +395,20 @@ blogSchema.statics.getBlogByTitle = async function (blogTitle) {
       throw new CustomError(404, "Blog not found");
     }
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-//get blog by slug
+// get blog by slug
 blogSchema.statics.getBlogBySlug = async function (blogSlug) {
   try {
-    // Find blog by slug and populate the blogedBy field while excluding the password field
-    const blog = await this.findOne({ slug: blogSlug }).populate("author", {
+    await this.activateDueScheduledBlogs();
+    const blog = await this.findOne({
+      ...liveBlogFilter(),
+      slug: blogSlug,
+    }).populate("author", {
       name: 1,
       image: 1,
       title: 1,
@@ -200,7 +419,6 @@ blogSchema.statics.getBlogBySlug = async function (blogSlug) {
       throw new CustomError(404, "Blog not found");
     }
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -210,7 +428,6 @@ blogSchema.statics.getBlogBySlug = async function (blogSlug) {
 // Define a static method to increase blog view count by 1
 blogSchema.statics.increaseBlogViewCount = async function (blogId) {
   try {
-    // Find blog by id and update
     const blog = await this.findByIdAndUpdate(
       blogId,
       { $inc: { totalViews: 1 } },
@@ -221,20 +438,18 @@ blogSchema.statics.increaseBlogViewCount = async function (blogId) {
       throw new CustomError(404, "Blog not found");
     }
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-
 // Define a static method to get 3 most recent blogs
 blogSchema.statics.getMostRecentBlogs = async function () {
   try {
-    // Find all blogs and populate the blogedBy field while excluding the password field
-    const blogs = await this.find()
-      .sort({ createdAt: -1 })
+    await this.activateDueScheduledBlogs();
+    const blogs = await this.find(liveBlogFilter())
+      .sort({ publishedAt: -1, createdAt: -1 })
       .limit(3)
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
@@ -242,7 +457,6 @@ blogSchema.statics.getMostRecentBlogs = async function () {
       throw new CustomError(404, "No blogs found");
     }
 
-    // Return blogs
     return blogs;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -252,16 +466,15 @@ blogSchema.statics.getMostRecentBlogs = async function () {
 // Define a static method to get blogs by category
 blogSchema.statics.getBlogsByCategory = async function (blogCategory) {
   try {
-    // Find blogs by category and populate the blogedBy field while excluding the password field
-    const blogs = await this.find({ category: blogCategory })
-      .sort({ createdAt: -1 })
+    await this.activateDueScheduledBlogs();
+    const blogs = await this.find({ ...liveBlogFilter(), category: blogCategory })
+      .sort({ publishedAt: -1, createdAt: -1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No blogs found");
     }
 
-    // Return blogs
     return blogs;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -271,16 +484,15 @@ blogSchema.statics.getBlogsByCategory = async function (blogCategory) {
 // Define a static method to get featured blogs
 blogSchema.statics.getFeaturedBlogs = async function () {
   try {
-    // Find featured blogs and populate the blogedBy field while excluding the password field
-    const blogs = await this.find({ isFeatured: true })
-      .sort({ createdAt: -1 })
+    await this.activateDueScheduledBlogs();
+    const blogs = await this.find({ ...liveBlogFilter(), isFeatured: true })
+      .sort({ publishedAt: -1, createdAt: -1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
     if (blogs?.length === 0) {
       throw new CustomError(404, "No featured blogs found");
     }
 
-    // Return blogs
     return blogs;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -290,7 +502,6 @@ blogSchema.statics.getFeaturedBlogs = async function () {
 // Define a static method to create a blog
 blogSchema.statics.createOneBlog = async function (blogData) {
   try {
-    //check if the title already exists (case insensitive)
     const blogExists = await this.findOne({
       title: { $regex: new RegExp(`^${blogData.title}$`, "i") },
     });
@@ -299,17 +510,15 @@ blogSchema.statics.createOneBlog = async function (blogData) {
       throw new CustomError(400, "Blog already exists with the same title");
     }
 
-    // Create blog
     const blog = await this.create(blogData);
 
     await blog.populate("author", {
       name: 1,
       image: 1,
       title: 1,
-      _id: 0,
+      _id: 1,
     });
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -319,7 +528,6 @@ blogSchema.statics.createOneBlog = async function (blogData) {
 // Define a static method to update a blog by id
 blogSchema.statics.updateOneBlog = async function ({ blogId, updatedData }) {
   try {
-    // Find blog by id and update
     const blog = await this.findByIdAndUpdate(blogId, updatedData, {
       new: true,
       runValidators: true,
@@ -333,10 +541,9 @@ blogSchema.statics.updateOneBlog = async function ({ blogId, updatedData }) {
       name: 1,
       image: 1,
       title: 1,
-      _id: 0,
+      _id: 1,
     });
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -346,10 +553,14 @@ blogSchema.statics.updateOneBlog = async function ({ blogId, updatedData }) {
 // Define a static method to toggle featured status of a blog by id
 blogSchema.statics.toggleFeaturedStatus = async function (blogId) {
   try {
-    // Find blog by id and update
+    const existingBlog = await this.findById(blogId);
+    if (!existingBlog) {
+      throw new CustomError(404, "Blog not found");
+    }
+
     const blog = await this.findByIdAndUpdate(
       blogId,
-      { isFeatured: true },
+      { isFeatured: !existingBlog.isFeatured, updatedAt: Timekoto() },
       { new: true, runValidators: true }
     );
 
@@ -357,7 +568,6 @@ blogSchema.statics.toggleFeaturedStatus = async function (blogId) {
       throw new CustomError(404, "Blog not found");
     }
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
@@ -367,27 +577,22 @@ blogSchema.statics.toggleFeaturedStatus = async function (blogId) {
 // Define a static method to delete a blog by id
 blogSchema.statics.deleteOneBlog = async function (blogId) {
   try {
-    // Find blog by id and delete
     const blog = await this.findByIdAndDelete(blogId);
 
     if (!blog) {
       throw new CustomError(404, "Blog not found");
     }
 
-    // Return blog
     return blog;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
 };
 
-//count documents
+// count documents
 blogSchema.statics.countDocuments = async function () {
   try {
-    // Count all documents
     const count = await this.find().countDocuments();
-
-    // Return count
     return count;
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);

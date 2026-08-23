@@ -2,24 +2,34 @@ const BlogRouter = require("express").Router();
 
 const {
   getAllBlogs,
+  getAllBlogsForAdmin,
+  getPublishedBlogsForAdmin,
   getBlogsForLandingPage,
   getOneBlog,
   getBlogByTitle,
   getBlogBySlug,
+  getBlogBySlugSingleParam,
+  getRelatedBlogs,
   increaseBlogViewCount,
   getMostRecentBlogs,
   getBlogsByCategory,
   getFeaturedBlogs,
+  getScheduledBlogs,
+  getDraftBlogs,
   createOneBlog,
   updateOneBlog,
   toggleFeaturedStatus,
   deleteOneBlog,
-  getBlogBySlugSingleParam,
 } = require("../../controllers/Content/Blog/BlogController");
 const { authorizeAdmin } = require("../../middlewares");
 
 BlogRouter.get("/all", getAllBlogs);
+BlogRouter.get("/admin/all", authorizeAdmin, getAllBlogsForAdmin);
+BlogRouter.get("/admin/published", authorizeAdmin, getPublishedBlogsForAdmin);
 BlogRouter.get("/landing", getBlogsForLandingPage);
+BlogRouter.get("/scheduled", authorizeAdmin, getScheduledBlogs);
+BlogRouter.get("/drafts", authorizeAdmin, getDraftBlogs);
+BlogRouter.get("/related/:slug", getRelatedBlogs);
 BlogRouter.get("/find/:id", getOneBlog);
 BlogRouter.get("/find-by-title/*", getBlogByTitle);
 BlogRouter.get("/find-by-slug/:slug", getBlogBySlugSingleParam);
