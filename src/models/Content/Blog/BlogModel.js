@@ -133,7 +133,11 @@ const liveBlogFilter = () => {
       },
       {
         publishStatus: { $exists: false },
-        published: { $ne: false },
+        scheduledAt: { $exists: false },
+      },
+      {
+        publishStatus: null,
+        scheduledAt: null,
       },
     ],
   };
@@ -247,13 +251,20 @@ blogSchema.statics.getPublishedBlogsForAdmin = async function () {
     const now = Timekoto();
     const blogs = await this.find({
       $or: [
-        { publishStatus: "published", published: true },
+        { publishStatus: "published", published: { $ne: false } },
         {
           publishStatus: "scheduled",
-          published: true,
+          published: { $ne: false },
           scheduledAt: { $lte: now },
         },
-        { publishStatus: { $exists: false } },
+        {
+          publishStatus: { $exists: false },
+          scheduledAt: { $exists: false },
+        },
+        {
+          publishStatus: null,
+          scheduledAt: null,
+        },
       ],
     })
       .sort({ publishedAt: -1, createdAt: -1 })

@@ -122,7 +122,7 @@ const isLivePublishedBlog = (blog = {}) => {
     return true;
   }
 
-  return !blog.publishStatus && blog.published !== false;
+  return !blog.publishStatus && !blog.scheduledAt;
 };
 
 // Helper to safely parse incoming request data
