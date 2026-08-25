@@ -30,6 +30,10 @@ const {
 const { generateToken, verifyToken } = require("./tokenHandlers/HandleJwt");
 const { getServerBaseUrl } = require("./urlHandlers/HandleBaseUrl");
 const { ObjectIdChecker } = require("./validationHandlers/ObjectIdChecker");
+const {
+  startScheduledBlogPublisher,
+  publishDueScheduledBlogs,
+} = require("./blogHandlers/HandleScheduledBlogs");
 
 module.exports = {
   sendPasswordResetOTPEmail,
@@ -53,4 +57,6 @@ module.exports = {
   verifyToken,
   getServerBaseUrl,
   ObjectIdChecker,
+  startScheduledBlogPublisher,
+  publishDueScheduledBlogs,
 };
