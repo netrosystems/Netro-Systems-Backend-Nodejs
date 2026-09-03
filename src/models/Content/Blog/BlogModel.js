@@ -178,23 +178,30 @@ const buildPublicBlogQuery = ({ search, category, tag } = {}) => {
 blogSchema.statics.activateDueScheduledBlogs = async function () {
   const now = Timekoto();
 
-  const result = await this.updateMany(
-    {
-      publishStatus: "scheduled",
-      scheduledAt: { $lte: now },
-    },
-    {
-      $set: {
-        publishStatus: "published",
-        published: true,
-        scheduledAt: null,
-        publishedAt: now,
-        updatedAt: now,
-      },
-    }
-  );
+  const dueBlogs = await this.find({
+    publishStatus: "scheduled",
+    scheduledAt: { $lte: now },
+  });
 
-  return result?.modifiedCount || 0;
+  if (dueBlogs.length > 0) {
+    const bulkOps = dueBlogs.map((blog) => ({
+      updateOne: {
+        filter: { _id: blog._id },
+        update: {
+          $set: {
+            publishStatus: "published",
+            published: true,
+            scheduledAt: null,
+            publishedAt: blog.scheduledAt || now,
+            updatedAt: now,
+          },
+        },
+      },
+    }));
+    await this.bulkWrite(bulkOps);
+  }
+
+  return dueBlogs.length;
 };
 
 blogSchema.index({ publishStatus: 1, published: 1, scheduledAt: 1, publishedAt: -1 });
@@ -217,11 +224,7 @@ blogSchema.statics.getAllBlogs = async function (queryParams = {}) {
       .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
     const total = await this.find(query).countDocuments();
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No blogs found");
-    }
-
-    return { data: blogs, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return { data: blogs || [], total: total || 0, page, limit, totalPages: Math.ceil((total || 0) / limit) };
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -235,11 +238,7 @@ blogSchema.statics.getAllBlogsForAdmin = async function () {
       .sort({ createdAt: -1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No blogs found");
-    }
-
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -270,11 +269,7 @@ blogSchema.statics.getPublishedBlogsForAdmin = async function () {
       .sort({ publishedAt: -1, createdAt: -1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No published blogs found");
-    }
-
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -292,11 +287,7 @@ blogSchema.statics.getScheduledBlogs = async function () {
       .sort({ scheduledAt: 1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No scheduled blogs found");
-    }
-
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -308,11 +299,7 @@ blogSchema.statics.getDraftBlogs = async function () {
       .sort({ updatedAt: -1, createdAt: -1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 1 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No draft blogs found");
-    }
-
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -338,7 +325,7 @@ blogSchema.statics.getRelatedBlogs = async function (blogSlug, limit = 5) {
       .limit(limit)
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -360,13 +347,10 @@ blogSchema.statics.getBlogsForLandingPage = async function () {
         .limit(3)
         .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
-      if (fallbackBlogs?.length === 0) {
-        throw new CustomError(404, "No blogs found");
-      }
-      return fallbackBlogs;
+      return fallbackBlogs || [];
     }
 
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -464,11 +448,7 @@ blogSchema.statics.getMostRecentBlogs = async function () {
       .limit(3)
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No blogs found");
-    }
-
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -482,11 +462,7 @@ blogSchema.statics.getBlogsByCategory = async function (blogCategory) {
       .sort({ publishedAt: -1, createdAt: -1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No blogs found");
-    }
-
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -500,11 +476,7 @@ blogSchema.statics.getFeaturedBlogs = async function () {
       .sort({ publishedAt: -1, createdAt: -1 })
       .populate("author", { name: 1, image: 1, title: 1, _id: 0 });
 
-    if (blogs?.length === 0) {
-      throw new CustomError(404, "No featured blogs found");
-    }
-
-    return blogs;
+    return blogs || [];
   } catch (error) {
     throw new CustomError(error?.statusCode, error?.message);
   }
@@ -539,10 +511,14 @@ blogSchema.statics.createOneBlog = async function (blogData) {
 // Define a static method to update a blog by id
 blogSchema.statics.updateOneBlog = async function ({ blogId, updatedData }) {
   try {
-    const blog = await this.findByIdAndUpdate(blogId, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    const blog = await this.findByIdAndUpdate(
+      blogId,
+      { ...updatedData, updatedAt: Timekoto() },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!blog) {
       throw new CustomError(404, "Blog not found");

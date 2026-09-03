@@ -348,16 +348,15 @@ const updateOneBlog = async (req, res) => {
     return sendResponse(res, 400, "Invalid ObjectId");
   }
 
+  const existingBlog = await Blog.findById(blogId);
+  if (!existingBlog) {
+    throw new CustomError(404, "Blog not found");
+  }
+
   const data = parseRequestData(req);
   let updatedData = data ? { ...data } : {};
 
   if (data?.publishStatus === "scheduled") {
-    const existingBlog = await Blog.findById(blogId).select(
-      "publishStatus published scheduledAt"
-    );
-    if (!existingBlog) {
-      throw new CustomError(404, "Blog not found");
-    }
     if (isLivePublishedBlog(existingBlog)) {
       throw new CustomError(
         400,
@@ -388,12 +387,18 @@ const updateOneBlog = async (req, res) => {
   }
 
   if (data && Object.prototype.hasOwnProperty.call(data, "publishStatus")) {
+    const fallbackPublishedAt =
+      data.publishedAt ||
+      (existingBlog.publishStatus === "published" || existingBlog.published
+        ? existingBlog.publishedAt
+        : null);
+
     updatedData = {
       ...updatedData,
       ...getBlogPublishFields({
         publishStatus: data.publishStatus,
         scheduledAt: data.scheduledAt,
-        publishedAt: data.publishedAt,
+        publishedAt: fallbackPublishedAt,
       }),
     };
   }
