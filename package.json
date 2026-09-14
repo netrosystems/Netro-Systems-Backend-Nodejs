@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.js",
     "start:dev": "nodemon src/index.js",
     "start:prod": "node dist/index.js",
-    "build": "esbuild src/index.js --bundle --platform=node --outfile=dist/index.js",
+    "build": "esbuild src/index.js --bundle --platform=node --outfile=dist/index.js --external:sharp",
     "build:split": "esbuild src/index.js --bundle --platform=node --outfile=dist/index.js --external:mongoose --external:sharp",
     "test": "jest"
   },
@@ -23,18 +23,23 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^8.0.1",
-    "multer": "^1.4.5-lts.1",
-    "nodemailer": "^6.9.3",
+    "multer": "^2.3.0",
+    "nodemailer": "^10.0.9",
     "otpauth": "^9.3.1",
     "prom-client": "^15.1.0",
     "qrcode": "^1.5.3",
-    "sharp": "^0.33.3",
+    "sharp": "^0.35.4",
     "timekoto": "^1.0.3",
     "uniquenaam": "^1.0.2",
     "winston": "^3.11.0"
   },
   "engines": {
     "node": ">=20.11.0"
+  },
+  "overrides": {
+    "express": {
+      "qs": "^6.16.0"
+    }
   },
   "devDependencies": {
     "esbuild": "^0.25.9",
