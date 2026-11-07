@@ -35,6 +35,14 @@ const leadSchema = new mongoose.Schema({
     default: () => Timekoto(),
     required: true,
   },
+  inquiryEmailDueAt: { type: Date, select: false, index: { sparse: true } },
+});
+
+leadSchema.set("toJSON", {
+  transform: (_lead, data) => {
+    delete data.inquiryEmailDueAt;
+    return data;
+  },
 });
 
 // Middleware to update `updatedAt` on every save
@@ -81,7 +89,7 @@ leadSchema.statics.getOneLead = async function (leadId) {
 leadSchema.statics.createOneLead = async function (leadData) {
   try {
     // Create lead
-    const lead = await this.create(leadData);
+    const lead = await this.create({ ...leadData, inquiryEmailDueAt: new Date() });
 
     // Return lead
     return lead;
