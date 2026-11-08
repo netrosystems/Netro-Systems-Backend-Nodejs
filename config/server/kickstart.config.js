@@ -3,6 +3,7 @@
 const { logger, startScheduledBlogPublisher } = require("../../src/services");
 const { connectToDatabase } = require("../../config");
 const { initializeExpress } = require("./express/express.config");
+const { startInquiryNotifications } = require("../../src/services/emailHandlers/SendInquiryNotifications");
 const port = process.env.SERVER_PORT || 5005;
 
 //starting the server
@@ -18,6 +19,7 @@ async function kickstartServer() {
     expressApp.listen(port, () => {
       logger.log("info", `Server is running on port: ${port}`);
       startScheduledBlogPublisher();
+      startInquiryNotifications();
     });
   } catch (error) {
     // Log the error and exit the process
