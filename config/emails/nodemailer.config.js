@@ -2,7 +2,7 @@
 
 const nodemailer = require("nodemailer");
 
-const nodemailerTransporter = nodemailer.createTransport({
+const createSmtpTransporter = (options = {}) => nodemailer.createTransport({
   host: process.env.SENDER_EMAIL_HOSTNAME,
   port: process.env.SENDER_EMAIL_PORT,
   auth: {
@@ -13,6 +13,9 @@ const nodemailerTransporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
+  ...options,
 });
 
-module.exports = { nodemailerTransporter };
+const nodemailerTransporter = createSmtpTransporter();
+
+module.exports = { nodemailerTransporter, createSmtpTransporter };

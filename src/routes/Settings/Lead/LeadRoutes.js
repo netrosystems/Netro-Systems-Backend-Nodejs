@@ -9,8 +9,8 @@ const {
 } = require("../../../controllers/Settings/Lead/Lead");
 const { authorizeAdmin } = require("../../../middlewares");
 
-LeadRouter.get("/all", getAllLeads);
-LeadRouter.get("/find/:id", getOneLead);
+LeadRouter.get("/all", authorizeAdmin, getAllLeads);
+LeadRouter.get("/find/:id", authorizeAdmin, getOneLead);
 LeadRouter.post("/create", createOneLead);
 LeadRouter.patch("/update/:id", authorizeAdmin, updateOneLead);
 LeadRouter.delete("/delete/:id", authorizeAdmin, deleteOneLead);
